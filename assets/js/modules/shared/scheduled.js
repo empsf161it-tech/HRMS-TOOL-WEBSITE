@@ -3,6 +3,7 @@ import { h, icon } from '../../core/dom.js';
 import { router } from '../../core/router.js';
 import { api } from '../../services/api.js';
 import { toastSuccess, openModal } from '../../components/ui.js';
+import { buildRecruitmentSubtab, buildLeaveSubtab, buildGenericSubtab } from './subtab-views.js';
 
 function animateCounter(el, targetStr, duration = 800) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -382,281 +383,317 @@ export default async function scheduledView(ctx) {
   });
   root.append(kpiGrid);
 
-  // 3. Responsive Subtabs Navigation Bar
+  // 4. Middle Layout (Left: 75% Filterable Table | Right: 25% Bento Summary)
+  function buildDefaultTableView() {
+    const middleGrid = h('div', { class: 'dash-middle-grid subtab-view' });
+
+    // Filters State
+    let filterDept = 'all';
+    let filterStatus = 'all';
+    let filterType = 'all';
+    let searchQuery = '';
+
+    const tableBody = h('tbody');
+
+    function renderTableRows() {
+      tableBody.replaceChildren();
+      const filtered = employees.filter((emp) => {
+        if (filterDept !== 'all' && emp.department !== filterDept) return false;
+        if (filterStatus !== 'all' && emp.status !== filterStatus) return false;
+        if (filterType !== 'all' && emp.type !== filterType) return false;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const matchName = emp.name?.toLowerCase().includes(q);
+          const matchDept = emp.department?.toLowerCase().includes(q);
+          const matchCode = emp.code?.toLowerCase().includes(q);
+          const matchRole = emp.designation?.toLowerCase().includes(q);
+          if (!matchName && !matchDept && !matchCode && !matchRole) return false;
+        }
+        return true;
+      });
+
+      if (!filtered.length) {
+        tableBody.append(h('tr', null,
+          h('td', { colspan: 7, style: 'text-align: center; padding: 36px; color: var(--text-muted);' },
+            h('div', { class: 'stack gap-2', style: 'align-items: center;' },
+              icon('search-x', { size: 28, style: 'opacity: 0.5;' }),
+              h('span', null, `No records match current filter in ${mod.label}.`)
+            )
+          )
+        ));
+        return;
+      }
+
+      filtered.forEach((emp, idx) => {
+        const isReady = (emp.status || 'Active').toLowerCase() === 'active';
+        const statusPillClass = isReady ? 'dash-status-pill--ready' : 'dash-status-pill--hold';
+        const row = h('tr', null,
+          h('td', { style: 'width: 36px;' }, h('input', { type: 'checkbox' })),
+          h('td', { style: 'width: 28px; color: var(--text-muted); font-size: 12px;' }, String(idx + 1)),
+          h('td', null,
+            h('div', { class: 'table-emp-cell' },
+              h('div', { class: 'table-emp-avatar-fallback' }, (emp.name || 'E')[0]),
+              h('div', { class: 'table-emp-meta' },
+                h('span', { class: 'table-emp-name' }, emp.name),
+                h('span', { class: 'table-emp-id' }, emp.code || `EMP00${idx + 10}`)
+              )
+            )
+          ),
+          h('td', null, emp.department || 'Operations'),
+          h('td', null, emp.designation || 'Specialist'),
+          h('td', null,
+            h('span', { class: `dash-status-pill ${statusPillClass}` }, emp.status || 'Active')
+          ),
+          h('td', { style: 'text-align: right;' },
+            h('button', {
+              class: 'dash-action-btn',
+              type: 'button',
+              onClick: () => toastSuccess(`Viewing profile for ${emp.name}`)
+            }, '⋮')
+          )
+        );
+        tableBody.append(row);
+      });
+    }
+
+    // Filter Toolbar Selects
+    const deptSelect = h('select', {
+      class: 'table-toolbar__select',
+      onChange: (e) => { filterDept = e.target.value; renderTableRows(); }
+    },
+      h('option', { value: 'all' }, 'All Departments'),
+      h('option', { value: 'Development' }, 'Development'),
+      h('option', { value: 'QA & Testing' }, 'QA & Testing'),
+      h('option', { value: 'Operations' }, 'Operations'),
+      h('option', { value: 'Product' }, 'Product'),
+      h('option', { value: 'Human Resources' }, 'Human Resources'),
+      h('option', { value: 'Finance' }, 'Finance')
+    );
+
+    const statusSelect = h('select', {
+      class: 'table-toolbar__select',
+      onChange: (e) => { filterStatus = e.target.value; renderTableRows(); }
+    },
+      h('option', { value: 'all' }, 'All Status'),
+      h('option', { value: 'Active' }, 'Active'),
+      h('option', { value: 'Pending' }, 'Pending Review'),
+      h('option', { value: 'On Leave' }, 'On Leave')
+    );
+
+    const typeSelect = h('select', {
+      class: 'table-toolbar__select',
+      onChange: (e) => { filterType = e.target.value; renderTableRows(); }
+    },
+      h('option', { value: 'all' }, 'All Types'),
+      h('option', { value: 'Deployed' }, 'Deployed Staff'),
+      h('option', { value: 'Internal' }, 'Internal Staff')
+    );
+
+    const searchInput = h('input', {
+      type: 'search',
+      class: 'table-toolbar__search-input',
+      placeholder: `Search ${mod.label} records…`,
+      onInput: (e) => {
+        searchQuery = e.target.value.trim();
+        renderTableRows();
+      }
+    });
+
+    const toolbar = h('div', { class: 'table-toolbar' },
+      h('div', { class: 'table-toolbar__filters' },
+        deptSelect,
+        statusSelect,
+        typeSelect,
+        h('div', { class: 'table-toolbar__search-wrap' },
+          icon('search', { size: 14, cls: 'table-toolbar__search-icon' }),
+          searchInput
+        )
+      ),
+      h('div', { class: 'table-toolbar__actions' },
+        h('button', {
+          class: 'table-toolbar__btn',
+          type: 'button',
+          onClick: () => toastSuccess(`Exporting ${mod.label} register to CSV…`)
+        },
+          icon('download', { size: 13 }),
+          h('span', null, 'Export CSV')
+        )
+      )
+    );
+
+    const selectAllCheckbox = h('input', {
+      type: 'checkbox',
+      onChange: (e) => {
+        const isChecked = e.target.checked;
+        tableBody.querySelectorAll('input[type="checkbox"]').forEach((cb) => cb.checked = isChecked);
+      }
+    });
+
+    renderTableRows();
+
+    const tableWrap = h('div', { class: 'dash-table-wrap' },
+      h('div', { style: 'overflow-x: auto;' },
+        h('table', { class: 'dash-table' },
+          h('thead', null,
+            h('tr', null,
+              h('th', { style: 'width: 36px;' }, selectAllCheckbox),
+              h('th', { style: 'width: 28px;' }, '#'),
+              h('th', null, 'Employee / Personnel'),
+              h('th', null, 'Department'),
+              h('th', null, 'Designation'),
+              h('th', null, 'Status'),
+              h('th', { style: 'text-align: right;' }, 'Action')
+            )
+          ),
+          tableBody
+        )
+      ),
+      h('div', { class: 'table-foot' },
+        h('span', null, `Showing 1 to ${Math.min(employees.length, 10)} of 428 records`),
+        h('div', { class: 'pagination-btns' },
+          h('button', { class: 'page-num-btn' }, '‹'),
+          h('button', { class: 'page-num-btn active' }, '1'),
+          h('button', { class: 'page-num-btn' }, '2'),
+          h('button', { class: 'page-num-btn' }, '3'),
+          h('span', { style: 'padding: 0 4px; color: var(--text-muted);' }, '…'),
+          h('button', { class: 'page-num-btn' }, '›')
+        ),
+        h('div', { class: 'cluster gap-2', style: 'font-size: 12px; color: var(--text-muted);' },
+          h('span', null, 'Per page'),
+          h('select', { class: 'table-toolbar__select', style: 'height: 28px; padding: 0 20px 0 8px;' },
+            h('option', null, '10')
+          )
+        )
+      )
+    );
+
+    const leftColumn = h('div', { style: 'display: flex; flex-direction: column; gap: 14px;' },
+      toolbar,
+      tableWrap
+    );
+    middleGrid.append(leftColumn);
+
+    // Right Column: Module Bento Summary & Quick Actions
+    const rightColumn = h('div', { style: 'display: flex; flex-direction: column; gap: 14px;' });
+
+    // 1. Donut / Stats Summary Card
+    const totalStats = prof.donutStats.reduce((sum, s) => sum + s.count, 0) || 100;
+    const summaryCard = h('div', { class: 'kpi-card', style: 'cursor: default;' },
+      h('div', { class: 'cluster', style: 'justify-content: space-between; align-items: center; margin-bottom: 12px;' },
+        h('h3', { style: 'font-size: 14px; font-weight: 700; margin: 0; color: var(--text);' }, prof.donutTitle),
+        icon('pie-chart', { size: 16, style: 'color: var(--color-primary);' })
+      ),
+      h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
+        ...prof.donutStats.map((item) => {
+          const pct = Math.round((item.count / totalStats) * 100);
+          return h('div', { style: 'display: flex; flex-direction: column; gap: 3px;' },
+            h('div', { class: 'donut-legend__item' },
+              h('span', { class: 'cluster gap-2', style: 'align-items: center;' },
+                h('span', { class: 'donut-legend__dot', style: `background: ${item.color};` }),
+                h('span', { style: 'font-weight: 500;' }, item.label)
+              ),
+              h('span', { style: 'font-weight: 700;' }, `${item.count} (${pct}%)`)
+            ),
+            h('div', { style: 'height: 5px; width: 100%; background: var(--surface-2); border-radius: 99px; overflow: hidden;' },
+              h('div', { style: `height: 100%; width: ${pct}%; background: ${item.color}; border-radius: 99px; transition: width 0.6s ease;` })
+            )
+          );
+        })
+      )
+    );
+    rightColumn.append(summaryCard);
+
+    // 2. Quick Action Shortcuts Card
+    const quickActionsCard = h('div', { class: 'kpi-card', style: 'cursor: default;' },
+      h('div', { class: 'cluster', style: 'justify-content: space-between; align-items: center; margin-bottom: 12px;' },
+        h('h3', { style: 'font-size: 14px; font-weight: 700; margin: 0; color: var(--text);' }, 'Quick Actions'),
+        icon('zap', { size: 16, style: 'color: #F59E0B;' })
+      ),
+      h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
+        ...prof.quickActions.map((qa) => h('button', {
+          class: 'quick-action-btn',
+          type: 'button',
+          onClick: () => toastSuccess(qa.action)
+        },
+          h('span', { class: 'cluster gap-2', style: 'align-items: center;' },
+            icon(qa.icon, { size: 14, style: 'color: var(--color-primary);' }),
+            h('span', null, qa.label)
+          ),
+          icon('chevron-right', { size: 13, style: 'color: var(--text-muted);' })
+        ))
+      )
+    );
+    rightColumn.append(quickActionsCard);
+
+    // 3. Enterprise Integration Status Banner
+    const statusBanner = h('div', {
+      class: 'kpi-card',
+      style: 'cursor: pointer; background: linear-gradient(135deg, rgba(30,96,255,0.06), rgba(99,102,241,0.06)); border-color: rgba(30,96,255,0.2);',
+      onClick: () => toastSuccess('Biometric devices, GPS geofencing & IndexedDB mock services are all fully operational!')
+    },
+      h('div', { class: 'cluster gap-2', style: 'align-items: center; margin-bottom: 6px;' },
+        icon('shield-check', { size: 16, style: 'color: #10B981;' }),
+        h('span', { style: 'font-size: 13px; font-weight: 700; color: var(--text);' }, 'Enterprise Sync Active')
+      ),
+      h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;' },
+        'Connected to IndexedDB real-time data layer with continuous audit history and zero latency.'
+      )
+    );
+    rightColumn.append(statusBanner);
+
+    middleGrid.append(rightColumn);
+    return middleGrid;
+  }
+
+  // 4. Subtab Dynamic Views Container & Switching Mechanism
+  const subtabContainer = h('div', { class: 'subtab-view-container', style: 'width: 100%; min-height: 420px;' });
+
+  function renderSubtabContent(tabName) {
+    if (mod.id === 'recruitment') {
+      return buildRecruitmentSubtab(tabName, employees, switchSubtab);
+    }
+    if (mod.id === 'leave') {
+      return buildLeaveSubtab(tabName, employees, switchSubtab);
+    }
+    if (tabName === prof.subtabs[0]) {
+      return buildDefaultTableView();
+    }
+    return buildGenericSubtab(tabName, mod, employees, switchSubtab);
+  }
+
+  function switchSubtab(tabName) {
+    activeSubtab = tabName;
+    subtabsBar.querySelectorAll('.dash-subtab').forEach((b) => {
+      b.classList.toggle('active', b.dataset.tab === tabName);
+    });
+    const view = renderSubtabContent(tabName);
+    subtabContainer.replaceChildren(view);
+  }
+
+  // Initial subtab determination
   let activeSubtab = prof.subtabs[0];
+  if (ctx.params?.sub) {
+    const subClean = ctx.params.sub.toLowerCase().replace(/[-_]/g, ' ');
+    const match = prof.subtabs.find((s) => s.toLowerCase().includes(subClean) || subClean.includes(s.toLowerCase()));
+    if (match) activeSubtab = match;
+  }
+
+  // Responsive Subtabs Navigation Bar
   const subtabsBar = h('div', { class: 'dash-subtabs' },
     ...prof.subtabs.map((tab) => h('button', {
       class: `dash-subtab${tab === activeSubtab ? ' active' : ''}`,
+      dataset: { tab },
       type: 'button',
-      onClick: (e) => {
-        activeSubtab = tab;
-        subtabsBar.querySelectorAll('.dash-subtab').forEach((b) => b.classList.remove('active'));
-        e.currentTarget.classList.add('active');
+      onClick: () => {
+        switchSubtab(tab);
         toastSuccess(`Switched to: ${tab}`);
       }
     }, tab))
   );
+
   root.append(subtabsBar);
-
-  // 4. Middle Layout (Left: 75% Filterable Table | Right: 25% Bento Summary)
-  const middleGrid = h('div', { class: 'dash-middle-grid' });
-
-  // Filters State
-  let filterDept = 'all';
-  let filterStatus = 'all';
-  let filterType = 'all';
-  let searchQuery = '';
-
-  const tableBody = h('tbody');
-
-  function renderTableRows() {
-    tableBody.replaceChildren();
-    const filtered = employees.filter((emp) => {
-      if (filterDept !== 'all' && emp.department !== filterDept) return false;
-      if (filterStatus !== 'all' && emp.status !== filterStatus) return false;
-      if (filterType !== 'all' && emp.type !== filterType) return false;
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        const matchName = emp.name?.toLowerCase().includes(q);
-        const matchDept = emp.department?.toLowerCase().includes(q);
-        const matchCode = emp.code?.toLowerCase().includes(q);
-        const matchRole = emp.designation?.toLowerCase().includes(q);
-        if (!matchName && !matchDept && !matchCode && !matchRole) return false;
-      }
-      return true;
-    });
-
-    if (!filtered.length) {
-      tableBody.append(h('tr', null,
-        h('td', { colspan: 7, style: 'text-align: center; padding: 36px; color: var(--text-muted);' },
-          h('div', { class: 'stack gap-2', style: 'align-items: center;' },
-            icon('search-x', { size: 28, style: 'opacity: 0.5;' }),
-            h('span', null, `No records match current filter in ${mod.label}.`)
-          )
-        )
-      ));
-      return;
-    }
-
-    filtered.forEach((emp, idx) => {
-      const isReady = (emp.status || 'Active').toLowerCase() === 'active';
-      const statusPillClass = isReady ? 'dash-status-pill--ready' : 'dash-status-pill--hold';
-      const row = h('tr', null,
-        h('td', { style: 'width: 36px;' }, h('input', { type: 'checkbox' })),
-        h('td', { style: 'width: 28px; color: var(--text-muted); font-size: 12px;' }, String(idx + 1)),
-        h('td', null,
-          h('div', { class: 'table-emp-cell' },
-            h('div', { class: 'table-emp-avatar-fallback' }, (emp.name || 'E')[0]),
-            h('div', { class: 'table-emp-meta' },
-              h('span', { class: 'table-emp-name' }, emp.name),
-              h('span', { class: 'table-emp-id' }, emp.code || `EMP00${idx + 10}`)
-            )
-          )
-        ),
-        h('td', null, emp.department || 'Operations'),
-        h('td', null, emp.designation || 'Specialist'),
-        h('td', null,
-          h('span', { class: `dash-status-pill ${statusPillClass}` }, emp.status || 'Active')
-        ),
-        h('td', { style: 'text-align: right;' },
-          h('button', {
-            class: 'dash-action-btn',
-            type: 'button',
-            onClick: () => toastSuccess(`Viewing profile for ${emp.name}`)
-          }, '⋮')
-        )
-      );
-      tableBody.append(row);
-    });
-  }
-
-  // Filter Toolbar Selects
-  const deptSelect = h('select', {
-    class: 'table-toolbar__select',
-    onChange: (e) => { filterDept = e.target.value; renderTableRows(); }
-  },
-    h('option', { value: 'all' }, 'All Departments'),
-    h('option', { value: 'Development' }, 'Development'),
-    h('option', { value: 'QA & Testing' }, 'QA & Testing'),
-    h('option', { value: 'Operations' }, 'Operations'),
-    h('option', { value: 'Product' }, 'Product'),
-    h('option', { value: 'Human Resources' }, 'Human Resources'),
-    h('option', { value: 'Finance' }, 'Finance')
-  );
-
-  const statusSelect = h('select', {
-    class: 'table-toolbar__select',
-    onChange: (e) => { filterStatus = e.target.value; renderTableRows(); }
-  },
-    h('option', { value: 'all' }, 'All Status'),
-    h('option', { value: 'Active' }, 'Active'),
-    h('option', { value: 'Pending' }, 'Pending Review'),
-    h('option', { value: 'On Leave' }, 'On Leave')
-  );
-
-  const typeSelect = h('select', {
-    class: 'table-toolbar__select',
-    onChange: (e) => { filterType = e.target.value; renderTableRows(); }
-  },
-    h('option', { value: 'all' }, 'All Types'),
-    h('option', { value: 'Deployed' }, 'Deployed Staff'),
-    h('option', { value: 'Internal' }, 'Internal Staff')
-  );
-
-  const searchInput = h('input', {
-    type: 'search',
-    class: 'table-toolbar__search-input',
-    placeholder: `Search ${mod.label} records…`,
-    onInput: (e) => {
-      searchQuery = e.target.value.trim();
-      renderTableRows();
-    }
-  });
-
-  const toolbar = h('div', { class: 'table-toolbar' },
-    h('div', { class: 'table-toolbar__filters' },
-      deptSelect,
-      statusSelect,
-      typeSelect,
-      h('div', { class: 'table-toolbar__search-wrap' },
-        icon('search', { size: 14, cls: 'table-toolbar__search-icon' }),
-        searchInput
-      )
-    ),
-    h('div', { class: 'table-toolbar__actions' },
-      h('button', {
-        class: 'table-toolbar__btn',
-        type: 'button',
-        onClick: () => toastSuccess(`Exporting ${mod.label} register to CSV…`)
-      },
-        icon('download', { size: 13 }),
-        h('span', null, 'Export CSV')
-      )
-    )
-  );
-
-  const selectAllCheckbox = h('input', {
-    type: 'checkbox',
-    onChange: (e) => {
-      const isChecked = e.target.checked;
-      tableBody.querySelectorAll('input[type="checkbox"]').forEach((cb) => cb.checked = isChecked);
-    }
-  });
-
-  renderTableRows();
-
-  const tableWrap = h('div', { class: 'dash-table-wrap' },
-    h('div', { style: 'overflow-x: auto;' },
-      h('table', { class: 'dash-table' },
-        h('thead', null,
-          h('tr', null,
-            h('th', { style: 'width: 36px;' }, selectAllCheckbox),
-            h('th', { style: 'width: 28px;' }, '#'),
-            h('th', null, 'Employee / Personnel'),
-            h('th', null, 'Department'),
-            h('th', null, 'Designation'),
-            h('th', null, 'Status'),
-            h('th', { style: 'text-align: right;' }, 'Action')
-          )
-        ),
-        tableBody
-      )
-    ),
-    h('div', { class: 'table-foot' },
-      h('span', null, `Showing 1 to ${Math.min(employees.length, 10)} of 428 records`),
-      h('div', { class: 'pagination-btns' },
-        h('button', { class: 'page-num-btn' }, '‹'),
-        h('button', { class: 'page-num-btn active' }, '1'),
-        h('button', { class: 'page-num-btn' }, '2'),
-        h('button', { class: 'page-num-btn' }, '3'),
-        h('span', { style: 'padding: 0 4px; color: var(--text-muted);' }, '…'),
-        h('button', { class: 'page-num-btn' }, '›')
-      ),
-      h('div', { class: 'cluster gap-2', style: 'font-size: 12px; color: var(--text-muted);' },
-        h('span', null, 'Per page'),
-        h('select', { class: 'table-toolbar__select', style: 'height: 28px; padding: 0 20px 0 8px;' },
-          h('option', null, '10')
-        )
-      )
-    )
-  );
-
-  const leftColumn = h('div', { style: 'display: flex; flex-direction: column; gap: 14px;' },
-    toolbar,
-    tableWrap
-  );
-  middleGrid.append(leftColumn);
-
-  // Right Column: Module Bento Summary & Quick Actions
-  const rightColumn = h('div', { style: 'display: flex; flex-direction: column; gap: 14px;' });
-
-  // 1. Donut / Stats Summary Card
-  const totalStats = prof.donutStats.reduce((sum, s) => sum + s.count, 0) || 100;
-  const summaryCard = h('div', { class: 'kpi-card', style: 'cursor: default;' },
-    h('div', { class: 'cluster', style: 'justify-content: space-between; align-items: center; margin-bottom: 12px;' },
-      h('h3', { style: 'font-size: 14px; font-weight: 700; margin: 0; color: var(--text);' }, prof.donutTitle),
-      icon('pie-chart', { size: 16, style: 'color: var(--color-primary);' })
-    ),
-    h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
-      ...prof.donutStats.map((item) => {
-        const pct = Math.round((item.count / totalStats) * 100);
-        return h('div', { style: 'display: flex; flex-direction: column; gap: 3px;' },
-          h('div', { class: 'donut-legend__item' },
-            h('span', { class: 'cluster gap-2', style: 'align-items: center;' },
-              h('span', { class: 'donut-legend__dot', style: `background: ${item.color};` }),
-              h('span', { style: 'font-weight: 500;' }, item.label)
-            ),
-            h('span', { style: 'font-weight: 700;' }, `${item.count} (${pct}%)`)
-          ),
-          h('div', { style: 'height: 5px; width: 100%; background: var(--surface-2); border-radius: 99px; overflow: hidden;' },
-            h('div', { style: `height: 100%; width: ${pct}%; background: ${item.color}; border-radius: 99px; transition: width 0.6s ease;` })
-          )
-        );
-      })
-    )
-  );
-  rightColumn.append(summaryCard);
-
-  // 2. Quick Action Shortcuts Card
-  const quickActionsCard = h('div', { class: 'kpi-card', style: 'cursor: default;' },
-    h('div', { class: 'cluster', style: 'justify-content: space-between; align-items: center; margin-bottom: 12px;' },
-      h('h3', { style: 'font-size: 14px; font-weight: 700; margin: 0; color: var(--text);' }, 'Quick Actions'),
-      icon('zap', { size: 16, style: 'color: #F59E0B;' })
-    ),
-    h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
-      ...prof.quickActions.map((qa) => h('button', {
-        class: 'quick-action-btn',
-        type: 'button',
-        onClick: () => toastSuccess(qa.action)
-      },
-        h('span', { class: 'cluster gap-2', style: 'align-items: center;' },
-          icon(qa.icon, { size: 14, style: 'color: var(--color-primary);' }),
-          h('span', null, qa.label)
-        ),
-        icon('chevron-right', { size: 13, style: 'color: var(--text-muted);' })
-      ))
-    )
-  );
-  rightColumn.append(quickActionsCard);
-
-  // 3. Enterprise Integration Status Banner
-  const statusBanner = h('div', {
-    class: 'kpi-card',
-    style: 'cursor: pointer; background: linear-gradient(135deg, rgba(30,96,255,0.06), rgba(99,102,241,0.06)); border-color: rgba(30,96,255,0.2);',
-    onClick: () => toastSuccess('Biometric devices, GPS geofencing & IndexedDB mock services are all fully operational!')
-  },
-    h('div', { class: 'cluster gap-2', style: 'align-items: center; margin-bottom: 6px;' },
-      icon('shield-check', { size: 16, style: 'color: #10B981;' }),
-      h('span', { style: 'font-size: 13px; font-weight: 700; color: var(--text);' }, 'Enterprise Sync Active')
-    ),
-    h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;' },
-      'Connected to IndexedDB real-time data layer with continuous audit history and zero latency.'
-    )
-  );
-  rightColumn.append(statusBanner);
-
-  middleGrid.append(rightColumn);
-  root.append(middleGrid);
+  subtabContainer.replaceChildren(renderSubtabContent(activeSubtab));
+  root.append(subtabContainer);
 
   return root;
 }
