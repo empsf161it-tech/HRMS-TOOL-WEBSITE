@@ -39,12 +39,12 @@ export default async function loginView(ctx) {
 
   // 1. Dedicated Top Navigation Bar
   const topbar = h('header', { class: 'auth-topbar fade-down' },
-    h('a', { href: '#/login', class: 'auth-logo' },
+    h('a', { href: '#/login', class: 'auth-logo', 'aria-label': `${brandName()} Home` },
       brandMark(32),
       h('span', null, brandName())
     ),
     h('div', { class: 'auth-topbar__switch' },
-      "Don't have an account?",
+      h('span', { class: 'auth-topbar__prompt' }, "Don't have an account?"),
       h('a', { href: '#/signup', class: 'auth-topbar__link' }, 'Sign Up')
     )
   );
@@ -255,6 +255,10 @@ export default async function loginView(ctx) {
     h('p', { class: 'auth-card__sub' }, 'Enter your credentials to access your account'),
     form,
     roleSelector,
+    h('div', { class: 'auth-card-footer-switch' },
+      "Don't have an account?",
+      h('a', { href: '#/signup', class: 'auth-card-footer-link' }, 'Sign Up')
+    ),
     h('div', { class: 'auth-trust-badge' },
       icon('shield-check', { size: 15 }),
       h('span', null, 'Secure · Fast · Reliable')

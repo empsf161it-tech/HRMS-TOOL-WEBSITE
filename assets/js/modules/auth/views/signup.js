@@ -10,12 +10,12 @@ export default async function signupView(ctx) {
 
   // 1. Dedicated Top Navigation Bar
   const topbar = h('header', { class: 'auth-topbar fade-down' },
-    h('a', { href: '#/login', class: 'auth-logo' },
+    h('a', { href: '#/login', class: 'auth-logo', 'aria-label': `${brandName()} Home` },
       brandMark(32),
       h('span', null, brandName())
     ),
     h('div', { class: 'auth-topbar__switch' },
-      'Already have an account?',
+      h('span', { class: 'auth-topbar__prompt' }, 'Already have an account?'),
       h('a', { href: '#/login', class: 'auth-topbar__link' }, 'Login')
     )
   );
@@ -285,16 +285,16 @@ export default async function signupView(ctx) {
         termsCheckbox,
         h('span', { style: 'font-size: 12.5px; line-height: 1.4;' },
           'I agree to the ',
-          h('a', { href: 'javascript:void(0)', class: 'auth-topbar__link', style: 'margin: 0;', onClick: () => showTermsModal('terms') }, 'Terms of Service'),
+          h('a', { href: 'javascript:void(0)', class: 'auth-inline-link', onClick: () => showTermsModal('terms') }, 'Terms of Service'),
           ' and ',
-          h('a', { href: 'javascript:void(0)', class: 'auth-topbar__link', style: 'margin: 0;', onClick: () => showTermsModal('privacy') }, 'Privacy Policy')
+          h('a', { href: 'javascript:void(0)', class: 'auth-inline-link', onClick: () => showTermsModal('privacy') }, 'Privacy Policy')
         )
       )
     ),
     submitBtn,
-    h('div', { style: 'text-align: center; margin-top: 18px; font-size: 13px; color: #64748B;' },
+    h('div', { class: 'auth-card-footer-switch' },
       'Already have an account?',
-      h('a', { href: '#/login', class: 'auth-topbar__link' }, 'Login')
+      h('a', { href: '#/login', class: 'auth-card-footer-link' }, 'Login')
     )
   );
 
