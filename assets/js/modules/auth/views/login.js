@@ -22,8 +22,8 @@ export default async function loginView(ctx) {
     }
   }
 
-  // Left art panel
-  const art = h('div', { class: 'login__art' },
+  // Left art panel (Left to Center)
+  const art = h('div', { class: 'login__art fade-left', style: '--anim-delay: 50ms;' },
     h('div', { class: 'aurora', 'aria-hidden': 'true' }),
     h('div', { class: 'stack gap-4 relative' },
       h('div', { class: 'cluster' }, brandMark(48), h('span', { class: 'brand__name text-2xl fw-800' }, brandName())),
@@ -35,7 +35,7 @@ export default async function loginView(ctx) {
         h('span', null, 'Live GPS & Face Terminal'),
         h('span', null, 'PF · ESI · PT · TDS'))));
 
-  // Right form panel
+  // Right form panel (Right to Center)
   const emailInput = h('input', {
     class: 'input',
     type: 'email',
@@ -86,25 +86,25 @@ export default async function loginView(ctx) {
       passInput),
     submitBtn);
 
-  // Quick-login chips
+  // Quick-login chips (Staggered upward)
   const quickChips = Object.entries(ROLES).map(([roleKey, roleDef]) => {
     return h('button', {
       type: 'button',
-      class: 'role-chip',
+      class: 'role-chip fade-up',
       onClick: () => performLogin(() => quickLogin(roleKey)),
     },
       icon(roleDef.icon || 'user', { size: 14 }),
       h('span', null, roleDef.label));
   });
 
-  const card = h('div', { class: 'card p-6 login__card' },
+  const card = h('div', { class: 'card p-6 login__card fade-right', style: '--anim-delay: 100ms;' },
     h('div', { class: 'stack gap-1' },
       h('div', { style: 'inline-size:48px;block-size:4px;border-radius:4px;background:linear-gradient(90deg, #E51821 0%, #5414B8 24%, #00A3E0 48%, #00B824 74%, #FFC500 100%);box-shadow:0 2px 8px rgba(84,20,184,0.35);margin-bottom:0.25rem' }),
       h('h1', { class: 'text-2xl fw-700' }, 'Sign In'),
       h('p', { class: 'text-muted text-sm' }, 'Select a demo persona or enter your credentials.')),
     h('div', { class: 'stack gap-2' },
       h('span', { class: 'text-xs fw-600 text-muted uppercase tracking-wider' }, 'Instant Demo Access:'),
-      h('div', { class: 'role-chips' }, ...quickChips)),
+      h('div', { class: 'role-chips stagger-children', dataset: { animateStagger: '60' } }, ...quickChips)),
     h('hr', null),
     form);
 

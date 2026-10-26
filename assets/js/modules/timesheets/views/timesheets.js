@@ -120,20 +120,20 @@ export default async function timesheetsView() {
   }
 
   const header = h('div', { class: 'dash-header' },
-    h('div', { class: 'dash-header__left' },
+    h('div', { class: 'dash-header__left fade-left', style: '--anim-delay: 50ms;' },
       h('div', { style: 'font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 2px;' },
         h('span', null, 'Staffing / Timesheets')
       ),
       h('h1', { class: 'dash-header__title' }, 'Timesheet Management'),
       h('p', { class: 'dash-header__sub' }, 'Track, approve and manage employee timesheets across all client deployments.')
     ),
-    h('div', { class: 'dash-header__right', style: 'display: flex; align-items: center; gap: 10px;' },
+    h('div', { class: 'dash-header__right fade-right', style: 'display: flex; align-items: center; gap: 10px; --anim-delay: 90ms;' },
       h('div', { style: 'position: relative;' }, rangeBtn),
       addTimesheetBtn
     )
   );
 
-  // 2. 6 KPI Cards matching Image 3
+  // 2. 6 KPI Cards matching Image 3 (Staggered Bottom to Center)
   const kpisData = [
     { title: 'Total Timesheets', target: 1248, prefix: '', suffix: '', trend: '↑ 12%', trendDir: 'up', sub: 'vs last month', iconBg: '#EFF6FF', iconColor: '#1E60FF', iconName: 'file-text' },
     { title: 'Approved', target: 1026, prefix: '', suffix: '', trend: '↑ 18%', trendDir: 'up', sub: 'vs last month', iconBg: '#ECFDF5', iconColor: '#10B981', iconName: 'check-circle' },
@@ -143,10 +143,10 @@ export default async function timesheetsView() {
     { title: 'Billable Amount', target: 48.5, prefix: '₹', suffix: 'L', trend: '↑ 20%', trendDir: 'up', sub: 'vs last month', iconBg: '#ECFDF5', iconColor: '#059669', iconName: 'indian-rupee' },
   ];
 
-  const kpisContainer = h('div', { class: 'kpi-grid' });
-  kpisData.forEach((k) => {
+  const kpisContainer = h('div', { class: 'kpi-grid stagger-children', dataset: { animateStagger: '90' } });
+  kpisData.forEach((k, idx) => {
     const valEl = h('div', { class: 'kpi-card__val' }, `${k.prefix}0${k.suffix}`);
-    const card = h('div', { class: 'kpi-card' },
+    const card = h('div', { class: 'kpi-card fade-up', style: `--anim-delay: ${idx * 85}ms;` },
       h('div', { class: 'kpi-card__top' },
         h('div', { class: 'kpi-card__icon-box', style: `background: ${k.iconBg}; color: ${k.iconColor};` },
           icon(k.iconName, { size: 18 })
@@ -163,10 +163,10 @@ export default async function timesheetsView() {
     animateCounter(valEl, k.target, k.prefix, k.suffix);
   });
 
-  // 3. Subtabs Bar (Employee Timesheets, Client-wise View, Project-wise View, Calendar View, Reports)
+  // 3. Subtabs Bar (Top to Center)
   const tabNames = ['Employee Timesheets', 'Client-wise View', 'Project-wise View', 'Calendar View', 'Reports'];
   let activeTab = 'Employee Timesheets';
-  const subtabsBar = h('div', { class: 'dash-subtabs' },
+  const subtabsBar = h('div', { class: 'dash-subtabs fade-down', style: '--anim-delay: 100ms;' },
     ...tabNames.map((tab) => h('button', {
       class: `dash-subtab${tab === activeTab ? ' active' : ''}`,
       type: 'button',
@@ -383,16 +383,16 @@ export default async function timesheetsView() {
     )
   );
 
-  const leftCol = h('div', { style: 'display: flex; flex-direction: column; gap: 12px;' },
+  const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 12px; --anim-delay: 110ms;' },
     toolbar,
     tableWrap
   );
 
-  // 5. Right Side Panel: 4 Cards
-  const rightCol = h('div', { style: 'display: flex; flex-direction: column; gap: 16px;' });
+  // 5. Right Side Panel: 4 Cards (Right to Center)
+  const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; --anim-delay: 160ms;' });
 
   // 5.1 Pending Approvals Panel
-  const pendingApprovalsCard = h('div', { class: 'panel-card' },
+  const pendingApprovalsCard = h('div', { class: 'panel-card fade-right', style: '--anim-delay: 180ms;' },
     h('div', { class: 'panel-card__head', style: 'margin-bottom: 12px;' },
       h('h2', { class: 'panel-card__title' }, 'Pending Approvals'),
       h('span', { class: 'panel-card__link', onClick: () => toast('View all pending timesheets') }, 'View All')

@@ -95,7 +95,7 @@ export default async function clientsView() {
           h('div', { class: 'client-hero-sub' }, 'IT Services & Consulting  |  Bengaluru, Karnataka')
         )
       ),
-      h('div', { class: 'client-hero-actions' },
+      h('div', { class: 'client-hero-actions fade-right', style: '--anim-delay: 90ms;' },
         h('button', {
           class: 'btn btn--ghost btn--sm',
           style: 'border: 1px solid var(--border); font-weight: 600; display: inline-flex; align-items: center; gap: 6px;',
@@ -122,13 +122,13 @@ export default async function clientsView() {
         )
       )
     ),
-    h('div', { class: 'client-hero-meta-grid' },
+    h('div', { class: 'client-hero-meta-grid stagger-children', dataset: { animateStagger: '80' } },
       [
         { label: 'Client Since', val: 'Jan 15, 2024', icon: 'calendar', bg: '#EFF6FF', color: '#1E60FF' },
         { label: 'Contract Type', val: 'Staffing Agreement', icon: 'file-text', bg: '#F5F3FF', color: '#7C3AED' },
         { label: 'Payment Terms', val: 'Net 30 Days', icon: 'credit-card', bg: '#E0F2FE', color: '#0284C7' },
         { label: 'Account Manager', val: 'Karthik M', icon: 'user', bg: '#ECFDF5', color: '#10B981' },
-      ].map((it) => h('div', { class: 'client-meta-chip' },
+      ].map((it) => h('div', { class: 'client-meta-chip fade-up' },
         h('div', { class: 'client-meta-chip__icon', style: `background: ${it.bg}; color: ${it.color};` },
           icon(it.icon, { size: 15 })
         ),
@@ -140,10 +140,10 @@ export default async function clientsView() {
     )
   );
 
-  // 3. Subtabs Bar (9 tabs)
+  // 3. Subtabs Bar (Top to Center)
   const tabNames = ['Overview', 'Employees', 'Timesheets', 'Payroll & Billing', 'Contracts', 'Contacts', 'Job Openings', 'Invoices', 'Reports'];
   let activeTab = 'Overview';
-  const subtabsBar = h('div', { class: 'dash-subtabs' },
+  const subtabsBar = h('div', { class: 'dash-subtabs fade-down', style: '--anim-delay: 100ms;' },
     ...tabNames.map((tab) => h('button', {
       class: `dash-subtab${tab === activeTab ? ' active' : ''}`,
       type: 'button',
@@ -156,7 +156,7 @@ export default async function clientsView() {
     }, tab))
   );
 
-  // 4. 6 KPI Cards matching Image 5
+  // 4. 6 KPI Cards matching Image 5 (Staggered Bottom to Center)
   const kpisData = [
     { title: 'Deployed Employees', target: 42, prefix: '', suffix: '', trend: '↑ 20%', trendDir: 'up', sub: 'vs last month', iconBg: '#EFF6FF', iconColor: '#1E60FF', iconName: 'users' },
     { title: 'Active Projects', target: 5, prefix: '', suffix: '', trend: '↑ 25%', trendDir: 'up', sub: '', iconBg: '#E0F2FE', iconColor: '#0284C7', iconName: 'briefcase' },
@@ -166,10 +166,10 @@ export default async function clientsView() {
     { title: 'Gross Margin', target: 3.6, prefix: '₹', suffix: ' L', trend: '↑ 24%', trendDir: 'up', sub: '', iconBg: '#ECFDF5', iconColor: '#059669', iconName: 'line-chart' },
   ];
 
-  const kpisContainer = h('div', { class: 'kpi-grid' });
-  kpisData.forEach((k) => {
+  const kpisContainer = h('div', { class: 'kpi-grid stagger-children', dataset: { animateStagger: '90' } });
+  kpisData.forEach((k, idx) => {
     const valEl = h('div', { class: 'kpi-card__val' }, `${k.prefix}0${k.suffix}`);
-    const card = h('div', { class: 'kpi-card' },
+    const card = h('div', { class: 'kpi-card fade-up', style: `--anim-delay: ${idx * 85}ms;` },
       h('div', { class: 'kpi-card__top' },
         h('div', { class: 'kpi-card__icon-box', style: `background: ${k.iconBg}; color: ${k.iconColor};` },
           icon(k.iconName, { size: 18 })

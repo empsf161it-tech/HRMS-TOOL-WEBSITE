@@ -116,7 +116,7 @@ export default async function payrollView() {
   }
 
   const header = h('div', { class: 'dash-header' },
-    h('div', { class: 'dash-header__left' },
+    h('div', { class: 'dash-header__left fade-left', style: '--anim-delay: 50ms;' },
       h('div', { style: 'font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 2px;' },
         h('span', null, 'Payroll'),
         icon('chevron-right', { size: 12 }),
@@ -125,13 +125,13 @@ export default async function payrollView() {
       h('h1', { class: 'dash-header__title' }, 'Process Payroll'),
       h('p', { class: 'dash-header__sub' }, 'Calculate, review and process salaries for your employees and deployed staff across all clients.')
     ),
-    h('div', { class: 'dash-header__right', style: 'display: flex; align-items: center; gap: 10px;' },
+    h('div', { class: 'dash-header__right fade-right', style: 'display: flex; align-items: center; gap: 10px; --anim-delay: 90ms;' },
       h('div', { style: 'position: relative;' }, periodBtn),
       runPayrollBtn
     )
   );
 
-  // 2. 5 KPI Cards matching Image 4
+  // 2. 5 KPI Cards matching Image 4 (Staggered Bottom to Center)
   const kpisData = [
     { title: 'Total Employees', target: 428, prefix: '', suffix: '', trend: '', sub: '312 Internal | 116 Deployed', iconBg: '#EFF6FF', iconColor: '#1E60FF', iconName: 'users' },
     { title: 'Total Payroll (Gross)', target: 1.24, prefix: '₹', suffix: ' Cr', trend: '↑ 12%', trendDir: 'up', sub: 'vs last month', iconBg: '#ECFDF5', iconColor: '#10B981', iconName: 'indian-rupee' },
@@ -140,10 +140,10 @@ export default async function payrollView() {
     { title: 'Ellowring Margin', target: 7.8, prefix: '₹', suffix: ' L', trend: '↑ 15%', trendDir: 'up', sub: 'vs last month', iconBg: '#F5F3FF', iconColor: '#7C3AED', iconName: 'pie-chart' },
   ];
 
-  const kpisContainer = h('div', { class: 'kpi-grid kpi-grid--5' });
-  kpisData.forEach((k) => {
+  const kpisContainer = h('div', { class: 'kpi-grid kpi-grid--5 stagger-children', dataset: { animateStagger: '90' } });
+  kpisData.forEach((k, idx) => {
     const valEl = h('div', { class: 'kpi-card__val' }, `${k.prefix}0${k.suffix}`);
-    const card = h('div', { class: 'kpi-card' },
+    const card = h('div', { class: 'kpi-card fade-up', style: `--anim-delay: ${idx * 85}ms;` },
       h('div', { class: 'kpi-card__top' },
         h('div', { class: 'kpi-card__icon-box', style: `background: ${k.iconBg}; color: ${k.iconColor};` },
           icon(k.iconName, { size: 18 })
@@ -160,10 +160,10 @@ export default async function payrollView() {
     animateCounter(valEl, k.target, k.prefix, k.suffix);
   });
 
-  // 3. Subtabs Bar
+  // 3. Subtabs Bar (Top to Center)
   const tabNames = ['Employee Payroll', 'Client-wise Payroll', 'Salary Components', 'Statutory Deductions', 'Bank Transfer', 'Reports'];
   let activeTab = 'Employee Payroll';
-  const subtabsBar = h('div', { class: 'dash-subtabs' },
+  const subtabsBar = h('div', { class: 'dash-subtabs fade-down', style: '--anim-delay: 100ms;' },
     ...tabNames.map((tab) => h('button', {
       class: `dash-subtab${tab === activeTab ? ' active' : ''}`,
       type: 'button',
@@ -373,16 +373,16 @@ export default async function payrollView() {
     )
   );
 
-  const leftCol = h('div', { style: 'display: flex; flex-direction: column; gap: 12px;' },
+  const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 12px; --anim-delay: 110ms;' },
     toolbar,
     tableWrap
   );
 
-  // 5. Right Side Panel: Summary + Quick Actions + Promo
-  const rightCol = h('div', { style: 'display: flex; flex-direction: column; gap: 16px;' });
+  // 5. Right Side Panel: Summary + Quick Actions + Promo (Right to Center)
+  const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; --anim-delay: 160ms;' });
 
   // 5.1 Payroll Summary - Sep 2026 Card
-  const summaryCard = h('div', { class: 'panel-card' },
+  const summaryCard = h('div', { class: 'panel-card fade-right', style: '--anim-delay: 180ms;' },
     h('div', { class: 'panel-card__head', style: 'margin-bottom: 14px;' },
       h('h2', { class: 'panel-card__title' }, 'Payroll Summary - Sep 2026')
     ),

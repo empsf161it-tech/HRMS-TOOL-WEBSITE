@@ -3,7 +3,7 @@ import { initComponents } from './components/index.js';
 import { db } from './services/mock-db.js';
 import { configStore } from './core/config-store.js';
 import { applyTheme } from './core/theme-engine.js';
-import { applyMotion } from './core/motion-engine.js';
+import { applyMotion, observeReveals } from './core/motion-engine.js';
 import { initI18n } from './core/i18n.js';
 import { restoreSession } from './core/auth.js';
 import { mountShell } from './shell/shell.js';
@@ -38,6 +38,7 @@ async function bootstrap() {
 
     // 7. Start router
     router.start(shell.outlet, shell.announcer);
+    observeReveals(document);
 
     // 8. Start background event simulator
     startRealtimeSimulator();

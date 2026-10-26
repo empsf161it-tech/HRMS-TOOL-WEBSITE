@@ -153,8 +153,8 @@ async function renderAdminDashboard(user, ctx) {
     }, 10);
   }
 
-  const header = h('div', { class: 'dash-header dash-animate-fade' },
-    h('div', { class: 'dash-header__titles' },
+  const header = h('div', { class: 'dash-header' },
+    h('div', { class: 'dash-header__titles fade-left', style: '--anim-delay: 50ms;' },
       h('h1', { class: 'dash-header__title' },
         `Welcome back, ${greetingName}!`,
         h('span', { class: 'dash-header__live-indicator' },
@@ -164,12 +164,12 @@ async function renderAdminDashboard(user, ctx) {
       ),
       h('p', { class: 'dash-header__subtitle' }, "Here's what's happening at Ellowring enterprise ecosystem today.")
     ),
-    actionsWrap
+    h('div', { class: 'dash-header__actions fade-right', style: '--anim-delay: 80ms;' }, periodBtn)
   );
   container.append(header);
 
-  // 2. ROW OF 6 KEY METRICS / KPI CARDS WITH LIVE NUMBER ANIMATION
-  const kpiGrid = h('div', { class: 'dash-kpi-grid' });
+  // 2. ROW OF 6 KEY METRICS / KPI CARDS WITH LIVE NUMBER ANIMATION (Staggered Bottom to Center)
+  const kpiGrid = h('div', { class: 'dash-kpi-grid stagger-children', dataset: { animateStagger: '100' } });
   const kpiItems = [
     {
       tone: 'blue',
@@ -252,8 +252,8 @@ async function renderAdminDashboard(user, ctx) {
     cardValueEls.push({ el: valueEl, item: k });
 
     const card = h('div', {
-      class: `kpi-card dash-animate-fade dash-delay-${idx + 1}`,
-      style: `--card-glow: ${k.glow};`,
+      class: 'kpi-card fade-up',
+      style: `--card-glow: ${k.glow}; --anim-delay: ${idx * 90}ms;`,
       tabindex: '0',
       role: 'button',
       'aria-label': `${k.label}: ${k.val}`,
@@ -296,16 +296,16 @@ async function renderAdminDashboard(user, ctx) {
     });
   }
 
-  // 3. MIDDLE ROW 1: CHARTS & QUICK ACTIONS
-  const middleRow1 = h('div', { class: 'dash-middle-row dash-animate-fade dash-delay-3' });
+  // 3. MIDDLE ROW 1: CHARTS & QUICK ACTIONS (Left and Right Alternate Slide-in Directions)
+  const middleRow1 = h('div', { class: 'dash-middle-row' });
 
-  // 3A. Card 1: Timesheet Overview (Stacked Bar Chart with Time Segment Tabs & Floating Tooltip)
-  const barCard = h('div', { class: 'chart-card' });
+  // 3A. Card 1: Timesheet Overview (Stacked Bar Chart: Left to Center)
+  const barCard = h('div', { class: 'chart-card fade-left', style: '--anim-delay: 100ms;' });
   const chartComponent = renderTimesheetStackedChart();
   barCard.append(chartComponent.el);
 
-  // 3B. Card 2: Client-wise Deployment (Donut Chart with Interactive Slice Hover & Center Label)
-  const donutCard = h('div', { class: 'chart-card' },
+  // 3B. Card 2: Client-wise Deployment (Donut Chart: Bottom to Center with Scale)
+  const donutCard = h('div', { class: 'chart-card fade-up', style: '--anim-delay: 180ms;' },
     h('div', { class: 'chart-card__head' },
       h('h3', { class: 'chart-card__title' }, 'Client-wise Deployment'),
       h('span', { class: 'text-xs text-muted fw-600' }, '186 Active')
@@ -313,8 +313,8 @@ async function renderAdminDashboard(user, ctx) {
     renderDeploymentDonut()
   );
 
-  // 3C. Card 3: Quick Actions (Vertical List with hover glide)
-  const quickActionsCard = h('div', { class: 'chart-card' },
+  // 3C. Card 3: Quick Actions (Vertical List: Right to Center)
+  const quickActionsCard = h('div', { class: 'chart-card fade-right', style: '--anim-delay: 240ms;' },
     h('div', { class: 'chart-card__head' },
       h('h3', { class: 'chart-card__title' }, 'Quick Actions'),
       h('span', { class: 'text-xs text-muted fw-600' }, 'Shortcuts')
@@ -325,11 +325,11 @@ async function renderAdminDashboard(user, ctx) {
   middleRow1.append(barCard, donutCard, quickActionsCard);
   container.append(middleRow1);
 
-  // 4. MIDDLE ROW 2: ACTIVITIES, APPROVALS, UPCOMING (3 COLUMNS)
-  const middleRow2 = h('div', { class: 'dash-three-col dash-animate-fade dash-delay-5' });
+  // 4. MIDDLE ROW 2: ACTIVITIES, APPROVALS, UPCOMING (3 COLUMNS: Left, Center-Up, Right)
+  const middleRow2 = h('div', { class: 'dash-three-col' });
 
-  // 4A. Recent Activities
-  const activitiesCard = h('div', { class: 'panel-card' },
+  // 4A. Recent Activities (Left to Center)
+  const activitiesCard = h('div', { class: 'panel-card fade-left', style: '--anim-delay: 120ms;' },
     h('div', { class: 'panel-card__head' },
       h('div', { class: 'panel-card__title-wrap' },
         h('h3', { class: 'panel-card__title' }, 'Recent Activities'),
@@ -340,9 +340,9 @@ async function renderAdminDashboard(user, ctx) {
     renderRecentActivities()
   );
 
-  // 4B. Pending Approvals (With live counter decrement and inline action support)
+  // 4B. Pending Approvals (Bottom to Center Rise)
   const approvalsBadge = h('span', { class: 'panel-card__badge' }, String(currentPendingApprovalsCount));
-  const approvalsCard = h('div', { class: 'panel-card' },
+  const approvalsCard = h('div', { class: 'panel-card fade-up', style: '--anim-delay: 200ms;' },
     h('div', { class: 'panel-card__head' },
       h('div', { class: 'panel-card__title-wrap' },
         h('h3', { class: 'panel-card__title' }, 'Pending Approvals'),
@@ -359,8 +359,8 @@ async function renderAdminDashboard(user, ctx) {
     })
   );
 
-  // 4C. Upcoming Milestones
-  const upcomingCard = h('div', { class: 'panel-card' },
+  // 4C. Upcoming Milestones (Right to Center)
+  const upcomingCard = h('div', { class: 'panel-card fade-right', style: '--anim-delay: 280ms;' },
     h('div', { class: 'panel-card__head' },
       h('h3', { class: 'panel-card__title' }, 'Upcoming'),
       h('a', { class: 'panel-card__link', href: '#/core-hr' }, 'View All')
@@ -371,9 +371,9 @@ async function renderAdminDashboard(user, ctx) {
   middleRow2.append(activitiesCard, approvalsCard, upcomingCard);
   container.append(middleRow2);
 
-  // 5. LOWER SECTION: ADDITIONAL FEATURES (12 CARDS GRID WITH LINEAR/STRIPE BENTO AESTHETICS)
-  const featuresSection = h('div', { class: 'features-section dash-animate-fade dash-delay-6' },
-    h('div', { class: 'features-section__head' },
+  // 5. LOWER SECTION: ADDITIONAL FEATURES (12 CARDS GRID: Staggered Upward)
+  const featuresSection = h('div', { class: 'features-section' },
+    h('div', { class: 'features-section__head fade-down', style: '--anim-delay: 80ms;' },
       h('h2', { class: 'features-section__title' },
         icon('sparkles', { size: 20, cls: 'color-accent' }),
         h('span', null, 'Additional Features to Add (Based on Your Current System)')
@@ -384,9 +384,9 @@ async function renderAdminDashboard(user, ctx) {
   );
   container.append(featuresSection);
 
-  // 6. BOTTOM BANNER / CTA & TAGLINE
-  const promoSection = h('div', { class: 'stack gap-2 dash-animate-fade dash-delay-7', style: 'margin-top: 4px;' },
-    h('div', { class: 'dash-bottom-promo' },
+  // 6. BOTTOM BANNER / CTA & TAGLINE (Center Reveal Zoom)
+  const promoSection = h('div', { class: 'stack gap-2', style: 'margin-top: 4px;' },
+    h('div', { class: 'dash-bottom-promo center-reveal', style: '--anim-delay: 140ms;' },
       h('div', { class: 'dash-bottom-promo__left' },
         h('div', { class: 'dash-bottom-promo__icon' }, '🚀'),
         h('div', { class: 'dash-bottom-promo__content' },
@@ -403,7 +403,7 @@ async function renderAdminDashboard(user, ctx) {
         icon('arrow-right', { size: 15 })
       )
     ),
-    h('div', { class: 'dash-tagline' }, 'One Platform. Endless Possibilities.')
+    h('div', { class: 'dash-tagline fade-up', style: '--anim-delay: 200ms;' }, 'One Platform. Endless Possibilities.')
   );
   container.append(promoSection);
 
@@ -1078,7 +1078,7 @@ function renderUpcomingMilestones() {
 
 /** Render the 12 Additional Features Cards Grid (Linear/Stripe Bento Aesthetics) */
 function render12FeatureCards() {
-  const grid = h('div', { class: 'features-grid' });
+  const grid = h('div', { class: 'features-grid stagger-children', dataset: { animateStagger: '75' } });
 
   const features = [
     {
@@ -1205,8 +1205,8 @@ function render12FeatureCards() {
 
   features.forEach((f, idx) => {
     const card = h('div', {
-      class: `feature-card dash-animate-fade dash-delay-${(idx % 6) + 1}`,
-      style: `--feat-bg: ${f.bg}; --feat-border: ${f.border}; --feat-icon-bg: ${f.iconBg}; --feat-accent: ${f.accent};`,
+      class: 'feature-card fade-up',
+      style: `--feat-bg: ${f.bg}; --feat-border: ${f.border}; --feat-icon-bg: ${f.iconBg}; --feat-accent: ${f.accent}; --anim-delay: ${(idx % 6) * 75}ms;`,
       onClick: () => {
         router.navigate(f.route);
       }

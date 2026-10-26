@@ -3,7 +3,8 @@ import { h, icon } from '../../core/dom.js';
 import { router } from '../../core/router.js';
 import { api } from '../../services/api.js';
 import { toastSuccess, openModal } from '../../components/ui.js';
-import { buildRecruitmentSubtab, buildLeaveSubtab, buildGenericSubtab } from './subtab-views.js';
+import { observeReveals } from '../../core/motion-engine.js';
+import { buildRecruitmentSubtab, buildLeaveSubtab, buildAttendanceSubtab, buildGenericSubtab } from './subtab-views.js';
 
 function animateCounter(el, targetStr, duration = 800) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -335,7 +336,7 @@ export default async function scheduledView(ctx) {
   );
 
   const header = h('div', { class: 'dash-header' },
-    h('div', { class: 'dash-header__left' },
+    h('div', { class: 'dash-header__left fade-left', style: '--anim-delay: 50ms;' },
       h('div', { class: 'cluster gap-2', style: 'font-size: 12px; color: var(--text-muted); margin-bottom: 2px;' },
         h('span', { style: 'cursor: pointer;', onClick: () => router.navigate('/home') }, 'Dashboard'),
         h('span', null, '›'),
@@ -350,20 +351,20 @@ export default async function scheduledView(ctx) {
       ),
       h('p', { class: 'dash-header__subtitle' }, mod.summary)
     ),
-    h('div', { class: 'dash-header__right cluster gap-3', style: 'align-items: center;' },
+    h('div', { class: 'dash-header__right cluster gap-3 fade-right', style: 'align-items: center; --anim-delay: 90ms;' },
       periodBtn,
       primaryBtn
     )
   );
   root.append(header);
 
-  // 2. Six Glowing KPI Metric Cards
-  const kpiGrid = h('div', { class: 'kpi-grid' });
-  prof.kpis.forEach((k) => {
+  // 2. Six Glowing KPI Metric Cards (Staggered upward into view: Bottom to Center)
+  const kpiGrid = h('div', { class: 'kpi-grid stagger-children', dataset: { animateStagger: '90' } });
+  prof.kpis.forEach((k, idx) => {
     const valEl = h('div', { class: 'kpi-card__val' }, k.val);
     const card = h('div', {
-      class: 'kpi-card',
-      style: `--card-glow: ${k.glow};`,
+      class: 'kpi-card fade-up',
+      style: `--card-glow: ${k.glow}; --anim-delay: ${idx * 85}ms;`,
       onClick: () => toastSuccess(`Viewing filtered records for: ${k.label}`)
     },
       h('div', { class: 'kpi-card__top' },
@@ -424,9 +425,17 @@ export default async function scheduledView(ctx) {
         return;
       }
 
+      const shiftPresets = ['General (09:00 - 18:00)', 'Morning (06:00 - 14:30)', 'General (09:00 - 18:00)', 'Evening (14:00 - 22:30)', 'General (09:00 - 18:00)'];
+      const punchPresets = ['09:04 AM', '09:12 AM', '09:28 AM', '08:58 AM', '09:02 AM', '06:05 AM', '09:05 AM', '09:14 AM', '09:01 AM', '09:10 AM'];
+      const modePresets = ['HQ Biometric #1', 'HQ Biometric #2', 'Face Scanner', 'HQ Biometric #1', 'GPS Geofence', 'HQ Biometric #1', 'HQ Biometric #2', 'Face Scanner', 'HQ Biometric #1', 'GPS Mobile'];
+
       filtered.forEach((emp, idx) => {
         const isReady = (emp.status || 'Active').toLowerCase() === 'active';
         const statusPillClass = isReady ? 'dash-status-pill--ready' : 'dash-status-pill--hold';
+        const shiftVal = shiftPresets[idx % shiftPresets.length];
+        const punchVal = punchPresets[idx % punchPresets.length];
+        const modeVal = modePresets[idx % modePresets.length];
+
         const row = h('tr', null,
           h('td', { style: 'width: 36px;' }, h('input', { type: 'checkbox' })),
           h('td', { style: 'width: 28px; color: var(--text-muted); font-size: 12px;' }, String(idx + 1)),
@@ -440,7 +449,15 @@ export default async function scheduledView(ctx) {
             )
           ),
           h('td', null, emp.department || 'Operations'),
-          h('td', null, emp.designation || 'Specialist'),
+          mod.id === 'attendance'
+            ? h('td', { style: 'font-size: 12px; color: var(--text-muted);' }, shiftVal)
+            : h('td', null, emp.designation || 'Specialist'),
+          mod.id === 'attendance'
+            ? h('td', { style: 'font-weight: 700; color: #10B981;' }, punchVal)
+            : null,
+          mod.id === 'attendance'
+            ? h('td', { style: 'font-size: 11.5px; color: var(--text-muted);' }, modeVal)
+            : null,
           h('td', null,
             h('span', { class: `dash-status-pill ${statusPillClass}` }, emp.status || 'Active')
           ),
@@ -540,7 +557,9 @@ export default async function scheduledView(ctx) {
               h('th', { style: 'width: 28px;' }, '#'),
               h('th', null, 'Employee / Personnel'),
               h('th', null, 'Department'),
-              h('th', null, 'Designation'),
+              mod.id === 'attendance' ? h('th', null, 'Shift Schedule') : h('th', null, 'Designation'),
+              mod.id === 'attendance' ? h('th', null, 'First In') : null,
+              mod.id === 'attendance' ? h('th', null, 'Work Mode') : null,
               h('th', null, 'Status'),
               h('th', { style: 'text-align: right;' }, 'Action')
             )
@@ -567,20 +586,88 @@ export default async function scheduledView(ctx) {
       )
     );
 
-    const leftColumn = h('div', { style: 'display: flex; flex-direction: column; gap: 14px;' },
+    const leftColumn = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%; min-width: 0; --anim-delay: 120ms;' },
       toolbar,
       tableWrap
     );
     middleGrid.append(leftColumn);
 
-    // Right Column: Module Bento Summary & Quick Actions
-    const rightColumn = h('div', { style: 'display: flex; flex-direction: column; gap: 14px;' });
+    // Right Column: Module Bento Summary & Quick Actions (Right to Center)
+    const rightColumn = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%; min-width: 0; --anim-delay: 180ms;' });
 
-    // 1. Donut / Stats Summary Card
+    // 1. Live Digital Clock & Geofence Punch Widget
+    let isPunchedIn = true;
+    const timeDisplayEl = h('div', { class: 'live-clock-display' });
+    const dateDisplayEl = h('div', { class: 'live-clock-date' });
+
+    function updateLiveClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      const hh = String(hours).padStart(2, '0');
+
+      timeDisplayEl.innerHTML = `${hh}:${minutes} <span class="live-clock-seconds">${seconds}</span> <span style="font-size:12px; color:var(--text-muted); font-weight:600; margin-left:2px;">${ampm} IST</span>`;
+      dateDisplayEl.textContent = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    updateLiveClock();
+
+    const clockInterval = setInterval(() => {
+      if (!middleGrid.isConnected) {
+        clearInterval(clockInterval);
+        return;
+      }
+      updateLiveClock();
+    }, 1000);
+
+    const punchStatusPill = h('span', { style: 'font-size: 11px; font-weight: 700; color: #10B981;' }, 'Punched In (09:14 AM)');
+
+    const punchBtn = h('button', {
+      class: 'live-punch-btn',
+      type: 'button',
+      onClick: () => {
+        isPunchedIn = !isPunchedIn;
+        if (isPunchedIn) {
+          punchBtn.innerHTML = `<span>✕ Web Punch Out</span>`;
+          punchBtn.classList.add('punched-in');
+          punchStatusPill.textContent = 'Punched In (' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ')';
+          punchStatusPill.style.color = '#10B981';
+          toastSuccess('Clock-In recorded successfully! GPS geofence verified (Radius: 36m).');
+        } else {
+          punchBtn.innerHTML = `<span>⚡ Web Punch In</span>`;
+          punchBtn.classList.remove('punched-in');
+          punchStatusPill.textContent = 'Clocked Out';
+          punchStatusPill.style.color = 'var(--text-muted)';
+          toastSuccess('Clock-Out recorded at ' + new Date().toLocaleTimeString() + '. Day attendance ledger updated.');
+        }
+      }
+    }, icon('fingerprint', { size: 16 }), h('span', null, 'Web Punch In / Out'));
+
+    const liveClockCard = h('div', { class: 'live-clock-card fade-right', style: '--anim-delay: 150ms;' },
+      h('div', { class: 'split', style: 'align-items: center;' },
+        h('span', { class: 'cluster gap-1', style: 'font-size: 11px; font-weight: 700; color: #10B981; background: rgba(16,185,129,0.12); padding: 2px 8px; border-radius: 99px;' },
+          h('span', { style: 'width: 6px; height: 6px; border-radius: 50%; background: #10B981; display: inline-block;' }),
+          'HQ Geofence Active (120m)'
+        ),
+        punchStatusPill
+      ),
+      timeDisplayEl,
+      dateDisplayEl,
+      punchBtn,
+      h('div', { class: 'split', style: 'margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(30,96,255,0.2); font-size: 11.5px; color: var(--text-muted);' },
+        h('span', null, 'Shift: General (09:00 - 18:00)'),
+        h('span', { style: 'color: #1E60FF; font-weight: 600;' }, '6h 48m Elapsed')
+      )
+    );
+    rightColumn.append(liveClockCard);
+
+    // 2. Donut / Stats Summary Card
     const totalStats = prof.donutStats.reduce((sum, s) => sum + s.count, 0) || 100;
-    const summaryCard = h('div', { class: 'kpi-card', style: 'cursor: default;' },
+    const summaryCard = h('div', { class: 'kpi-card fade-right', style: 'cursor: default; --anim-delay: 200ms;' },
       h('div', { class: 'cluster', style: 'justify-content: space-between; align-items: center; margin-bottom: 12px;' },
-        h('h3', { style: 'font-size: 14px; font-weight: 700; margin: 0; color: var(--text);' }, prof.donutTitle),
+        h('h3', { style: 'font-size: 13.5px; font-weight: 700; margin: 0; color: var(--text);' }, prof.donutTitle),
         icon('pie-chart', { size: 16, style: 'color: var(--color-primary);' })
       ),
       h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
@@ -603,10 +690,71 @@ export default async function scheduledView(ctx) {
     );
     rightColumn.append(summaryCard);
 
-    // 2. Quick Action Shortcuts Card
-    const quickActionsCard = h('div', { class: 'kpi-card', style: 'cursor: default;' },
+    // 3. Real-Time Activity Feed / Punch Stream
+    const streamItems = [
+      { name: 'Karthik Mukherjee', action: 'Biometric In-Punch', time: '3m ago', loc: 'Gate #1 (Terminal 02)', dot: '#10B981' },
+      { name: 'Priya Sharma', action: 'WFH Geotag Punch', time: '12m ago', loc: 'Mobile App · Verified', dot: '#0EA5E9' },
+      { name: 'Deepa Patel', action: 'Break Out (Lunch)', time: '24m ago', loc: 'Floor 2 Terminal', dot: '#F59E0B' },
+      { name: 'Suresh Kulkarni', action: 'Regularization Approved', time: '45m ago', loc: 'Approved by HR Lead', dot: '#8B5CF6' },
+    ];
+
+    const activityStreamCard = h('div', { class: 'kpi-card fade-right', style: 'cursor: default; --anim-delay: 240ms;' },
+      h('div', { class: 'split', style: 'align-items: center; margin-bottom: 10px;' },
+        h('h3', { style: 'font-size: 13.5px; font-weight: 700; margin: 0; color: var(--text);' }, 'Live Activity Stream'),
+        h('span', { class: 'cluster gap-1', style: 'font-size: 10.5px; font-weight: 700; color: #10B981;' },
+          h('span', { style: 'width: 6px; height: 6px; border-radius: 50%; background: #10B981; display: inline-block;' }),
+          'Live Socket'
+        )
+      ),
+      h('div', { style: 'display: flex; flex-direction: column; gap: 7px;' },
+        ...streamItems.map((item) => h('div', { class: 'activity-stream-item' },
+          h('span', { class: 'activity-stream-dot', style: `background: ${item.dot};` }),
+          h('div', { style: 'flex: 1; min-width: 0;' },
+            h('div', { class: 'split', style: 'font-weight: 600;' },
+              h('span', { style: 'color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;' }, item.name),
+              h('span', { style: 'color: var(--text-muted); font-size: 11px;' }, item.time)
+            ),
+            h('div', { style: 'font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; gap: 4px; margin-top: 1px;' },
+              h('span', { style: 'color: #1E60FF; font-weight: 500;' }, item.action),
+              h('span', null, item.loc)
+            )
+          )
+        ))
+      )
+    );
+    rightColumn.append(activityStreamCard);
+
+    // 4. Today's On-Leave Watchlist
+    const leaveWatchlist = [
+      { name: 'Priya Sharma', dept: 'QA & Testing', type: 'Privilege Leave (PL)', returnDate: 'Returns Oct 02', color: '#2563EB' },
+      { name: 'Vikram S', dept: 'Infrastructure', type: 'Sick Leave (SL)', returnDate: 'Day 2 of 2', color: '#10B981' },
+      { name: 'Sneha Raman', dept: 'Product', type: 'Comp-Off', returnDate: 'Back Tomorrow', color: '#7C3AED' },
+    ];
+
+    const watchlistCard = h('div', { class: 'kpi-card fade-right', style: 'cursor: default; --anim-delay: 280ms;' },
+      h('div', { class: 'split', style: 'align-items: center; margin-bottom: 10px;' },
+        h('h3', { style: 'font-size: 13.5px; font-weight: 700; margin: 0; color: var(--text);' }, 'On Leave Today'),
+        h('span', { style: 'font-size: 11px; font-weight: 700; color: #6366F1; background: rgba(99,102,241,0.1); padding: 2px 7px; border-radius: 99px;' }, '3 Members')
+      ),
+      h('div', { style: 'display: flex; flex-direction: column; gap: 7px;' },
+        ...leaveWatchlist.map((l) => h('div', { class: 'watchlist-item' },
+          h('div', { class: 'cluster gap-2', style: 'align-items: center;' },
+            h('div', { style: `width: 26px; height: 26px; border-radius: 50%; background: ${l.color}; color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center;` }, l.name[0]),
+            h('div', null,
+              h('div', { style: 'font-weight: 600; font-size: 12px; color: var(--text);' }, l.name),
+              h('div', { style: 'font-size: 11px; color: var(--text-muted);' }, l.type)
+            )
+          ),
+          h('span', { style: 'font-size: 11px; font-weight: 600; color: #1E60FF;' }, l.returnDate)
+        ))
+      )
+    );
+    rightColumn.append(watchlistCard);
+
+    // 5. Quick Action Shortcuts Card
+    const quickActionsCard = h('div', { class: 'kpi-card fade-right', style: 'cursor: default; --anim-delay: 320ms;' },
       h('div', { class: 'cluster', style: 'justify-content: space-between; align-items: center; margin-bottom: 12px;' },
-        h('h3', { style: 'font-size: 14px; font-weight: 700; margin: 0; color: var(--text);' }, 'Quick Actions'),
+        h('h3', { style: 'font-size: 13.5px; font-weight: 700; margin: 0; color: var(--text);' }, 'Quick Actions'),
         icon('zap', { size: 16, style: 'color: #F59E0B;' })
       ),
       h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
@@ -625,11 +773,11 @@ export default async function scheduledView(ctx) {
     );
     rightColumn.append(quickActionsCard);
 
-    // 3. Enterprise Integration Status Banner
+    // 6. Enterprise Integration Status Banner
     const statusBanner = h('div', {
-      class: 'kpi-card',
-      style: 'cursor: pointer; background: linear-gradient(135deg, rgba(30,96,255,0.06), rgba(99,102,241,0.06)); border-color: rgba(30,96,255,0.2);',
-      onClick: () => toastSuccess('Biometric devices, GPS geofencing & IndexedDB mock services are all fully operational!')
+      class: 'kpi-card fade-right',
+      style: 'cursor: pointer; background: linear-gradient(135deg, rgba(30,96,255,0.06), rgba(99,102,241,0.06)); border-color: rgba(30,96,255,0.2); --anim-delay: 360ms;',
+      onClick: () => toastSuccess('Biometric devices, GPS geofencing & IndexedDB services are all 100% operational!')
     },
       h('div', { class: 'cluster gap-2', style: 'align-items: center; margin-bottom: 6px;' },
         icon('shield-check', { size: 16, style: 'color: #10B981;' }),
@@ -655,6 +803,12 @@ export default async function scheduledView(ctx) {
     if (mod.id === 'leave') {
       return buildLeaveSubtab(tabName, employees, switchSubtab);
     }
+    if (mod.id === 'attendance') {
+      if (tabName === prof.subtabs[0]) {
+        return buildDefaultTableView();
+      }
+      return buildAttendanceSubtab(tabName, employees, switchSubtab);
+    }
     if (tabName === prof.subtabs[0]) {
       return buildDefaultTableView();
     }
@@ -668,6 +822,7 @@ export default async function scheduledView(ctx) {
     });
     const view = renderSubtabContent(tabName);
     subtabContainer.replaceChildren(view);
+    observeReveals(subtabContainer);
   }
 
   // Initial subtab determination
@@ -678,8 +833,8 @@ export default async function scheduledView(ctx) {
     if (match) activeSubtab = match;
   }
 
-  // Responsive Subtabs Navigation Bar
-  const subtabsBar = h('div', { class: 'dash-subtabs' },
+  // Responsive Subtabs Navigation Bar (Top to Center)
+  const subtabsBar = h('div', { class: 'dash-subtabs fade-down', style: '--anim-delay: 110ms;' },
     ...prof.subtabs.map((tab) => h('button', {
       class: `dash-subtab${tab === activeSubtab ? ' active' : ''}`,
       dataset: { tab },

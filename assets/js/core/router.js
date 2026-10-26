@@ -3,7 +3,7 @@ import { findModule } from '../modules/registry.js';
 import { can, canModule } from './permissions.js';
 import { appStore } from './store.js';
 import { bus } from './events.js';
-import { motionReduced } from './motion-engine.js';
+import { motionReduced, observeReveals } from './motion-engine.js';
 import { configStore } from './config-store.js';
 import { t } from './i18n.js';
 import { h } from './dom.js';
@@ -99,6 +99,7 @@ async function render() {
     document.title = `${header.title || 'Ellowring'} · ${t('app.name')}`;
     announcer && (announcer.textContent = header.title);
     outlet.focus({ preventScroll: true }); scrollTo({ top: 0 });
+    observeReveals(outlet);
     bus.emit('route-change', { ...loc, module: r.mod, route: r.route });
   } catch (err) {
     clearTimeout(skeletonTimer);

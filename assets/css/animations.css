@@ -1,11 +1,47 @@
-/* Purpose: all keyframes and the data-animate motion system (layer: components). Only transform/opacity are animated. */
+/* Purpose: Premium Four-Direction Scroll Animation System & Keyframe library (layer: components).
+   Directions:
+   - Left to Center: .fade-left / [data-animate="fade-left"]
+   - Right to Center: .fade-right / [data-animate="fade-right"]
+   - Top to Center: .fade-down / [data-animate="fade-down"]
+   - Bottom to Center: .fade-up / [data-animate="fade-up"]
+   - Center Reveal: .center-reveal / .zoom-in / [data-animate="center-reveal"]
+   - Stagger Container: .stagger-children / [data-animate-stagger]
+   All transitions respect prefers-reduced-motion and use GPU-accelerated transforms. */
+
 @layer components {
+  /* =========================================================================
+     1. Motion Physics & Default Tokens
+     ========================================================================= */
+  :root {
+    --anim-dur: 800ms;
+    --anim-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --anim-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --slide-dist-y: 50px;
+    --slide-dist-y-neg: -45px;
+    --slide-dist-x: 60px;
+    --slide-dist-x-neg: -60px;
+    --stagger-step: 120ms;
+  }
+
+  /* Prevent horizontal scrollbars caused by offscreen entrance positions */
+  body,
+  .app__main,
+  .dashboard-page,
+  .subtab-view,
+  .launch-card {
+    overflow-x: hidden;
+  }
+
+  /* =========================================================================
+     2. Core Keyframes
+     ========================================================================= */
   @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-  @keyframes fade-down { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
-  @keyframes slide-left { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
-  @keyframes slide-right { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
-  @keyframes zoom { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+  @keyframes fade-up { from { opacity: 0; transform: translate3d(0, var(--slide-dist-y), 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+  @keyframes fade-down { from { opacity: 0; transform: translate3d(0, var(--slide-dist-y-neg), 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+  @keyframes slide-left { from { opacity: 0; transform: translate3d(var(--slide-dist-x-neg), 0, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+  @keyframes slide-right { from { opacity: 0; transform: translate3d(var(--slide-dist-x), 0, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+  @keyframes zoom { from { opacity: 0; transform: scale3d(0.92, 0.92, 1); } to { opacity: 1; transform: scale3d(1, 1, 1); } }
+  @keyframes center-reveal { from { opacity: 0; transform: translate3d(0, 16px, 0) scale3d(0.94, 0.94, 1); } to { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); } }
   @keyframes blur { from { opacity: 0; filter: blur(12px); } to { opacity: 1; filter: none; } }
   @keyframes flip { from { opacity: 0; transform: perspective(600px) rotateX(-18deg); } to { opacity: 1; transform: none; } }
   @keyframes shimmer { to { transform: translateX(100%); } }
@@ -22,39 +58,231 @@
   @keyframes ripple { to { transform: scale(4); opacity: 0; } }
   @keyframes slide-down { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
-  [data-animate] { --anim-name: fade-up; }
-  [data-animate="fade-in"] { --anim-name: fade-in; }
-  [data-animate="fade-up"] { --anim-name: fade-up; }
-  [data-animate="fade-down"] { --anim-name: fade-down; }
-  [data-animate="slide-left"] { --anim-name: slide-left; }
-  [data-animate="slide-right"] { --anim-name: slide-right; }
-  [data-animate="zoom"], [data-animate="scale-in"] { --anim-name: zoom; }
-  [data-animate="blur"], [data-animate="blur-in"] { --anim-name: blur; }
-  [data-animate="flip"] { --anim-name: flip; }
-  [data-animate="none"] { --anim-name: none; }
+  /* =========================================================================
+     3. Four-Direction Reusable Transition Rules
+     ========================================================================= */
 
-  /* time-based reveal (IntersectionObserver adds .is-visible) */
-  html.js:not([data-scroll-driven]) [data-animate]:not(.is-visible) { opacity: 0; }
-  html.js:not([data-scroll-driven]) [data-animate].is-visible {
-    animation-name: var(--anim-name); animation-duration: var(--anim-dur, var(--dur-slow));
-    animation-delay: var(--anim-delay, 0ms); animation-timing-function: var(--ease-out); animation-fill-mode: both;
+  /* Base animated element declarations (hardware-accelerated, silky smooth transition) */
+  .fade-up,
+  .fade-down,
+  .fade-left,
+  .fade-right,
+  .zoom-in,
+  .center-reveal,
+  [data-animate],
+  .dash-animate-fade {
+    transition-property: opacity, transform, filter;
+    transition-duration: var(--anim-dur, 800ms);
+    transition-timing-function: var(--anim-ease, cubic-bezier(0.22, 1, 0.36, 1));
+    transition-delay: var(--anim-delay, var(--stagger-delay, 0ms));
+    will-change: transform, opacity;
+    backface-visibility: hidden;
   }
-  /* scroll-driven reveal where supported */
-  @supports (animation-timeline: view()) {
-    html[data-scroll-driven] [data-animate] {
-      animation-name: var(--anim-name); animation-timeline: view(); animation-range: entry 4% cover 26%;
-      animation-fill-mode: both; animation-timing-function: var(--ease-out); animation-duration: 1ms;
+
+  /* Initial off-screen positions (Active when JavaScript is running) */
+  html.js .fade-up:not(.is-visible),
+  html.js [data-animate="fade-up"]:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(0, var(--slide-dist-y, 50px), 0);
+  }
+
+  html.js .fade-down:not(.is-visible),
+  html.js [data-animate="fade-down"]:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(0, var(--slide-dist-y-neg, -45px), 0);
+  }
+
+  html.js .fade-left:not(.is-visible),
+  html.js [data-animate="fade-left"]:not(.is-visible),
+  html.js [data-animate="slide-left"]:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(var(--slide-dist-x-neg, -60px), 0, 0);
+  }
+
+  html.js .fade-right:not(.is-visible),
+  html.js [data-animate="fade-right"]:not(.is-visible),
+  html.js [data-animate="slide-right"]:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(var(--slide-dist-x, 60px), 0, 0);
+  }
+
+  html.js .zoom-in:not(.is-visible),
+  html.js [data-animate="zoom-in"]:not(.is-visible),
+  html.js [data-animate="zoom"]:not(.is-visible),
+  html.js [data-animate="scale-in"]:not(.is-visible) {
+    opacity: 0;
+    transform: scale3d(0.92, 0.92, 1);
+  }
+
+  html.js .center-reveal:not(.is-visible),
+  html.js [data-animate="center-reveal"]:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale3d(0.94, 0.94, 1);
+  }
+
+  html.js [data-animate="fade-in"]:not(.is-visible) {
+    opacity: 0;
+    transform: none;
+  }
+
+  /* Cards & imagery subtle scale refinement during bottom/lateral entrance */
+  html.js .kpi-card.fade-up:not(.is-visible),
+  html.js .feature-card.fade-up:not(.is-visible),
+  html.js .interactive-card.fade-up:not(.is-visible),
+  html.js .chart-card.fade-up:not(.is-visible),
+  html.js .panel-card.fade-up:not(.is-visible),
+  html.js .dash-bottom-promo.fade-up:not(.is-visible),
+  html.js .dash-bottom-promo.center-reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(0, var(--slide-dist-y, 45px), 0) scale3d(0.97, 0.97, 1);
+  }
+
+  html.js img.fade-left:not(.is-visible),
+  html.js .brand-logo-img.fade-left:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(var(--slide-dist-x-neg, -50px), 0, 0) scale3d(0.96, 0.96, 1);
+  }
+
+  html.js img.fade-right:not(.is-visible) {
+    opacity: 0;
+    transform: translate3d(var(--slide-dist-x, 50px), 0, 0) scale3d(0.96, 0.96, 1);
+  }
+
+  /* =========================================================================
+     4. Revealed State (.is-visible)
+     ========================================================================= */
+  .fade-up.is-visible,
+  .fade-down.is-visible,
+  .fade-left.is-visible,
+  .fade-right.is-visible,
+  .zoom-in.is-visible,
+  .center-reveal.is-visible,
+  [data-animate].is-visible,
+  .dash-animate-fade.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+
+  /* =========================================================================
+     5. Staggered Entrance System (.stagger-children)
+     ========================================================================= */
+  /* Direct children of stagger containers default to fade-up with progressive delays */
+  html.js .stagger-children > *:not(.is-visible):not(.fade-down):not(.fade-left):not(.fade-right):not(.zoom-in):not(.center-reveal),
+  html.js .subtab-grid > *:not(.is-visible):not(.fade-down):not(.fade-left):not(.fade-right):not(.zoom-in):not(.center-reveal),
+  html.js .pipeline-board > *:not(.is-visible):not(.fade-down):not(.fade-left):not(.fade-right):not(.zoom-in):not(.center-reveal) {
+    opacity: 0;
+    transform: translate3d(0, var(--slide-dist-y, 45px), 0) scale3d(0.97, 0.97, 1);
+    transition-property: opacity, transform;
+    transition-duration: var(--anim-dur, 800ms);
+    transition-timing-function: var(--anim-ease, cubic-bezier(0.22, 1, 0.36, 1));
+    transition-delay: var(--anim-delay, var(--stagger-delay, 0ms));
+    will-change: transform, opacity;
+  }
+
+  .stagger-children > *.is-visible,
+  .subtab-grid > *.is-visible,
+  .pipeline-board > *.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+
+  /* Stagger delays (120ms standard cadence for supreme polish) */
+  .stagger-children > *:nth-child(1), .subtab-grid > *:nth-child(1), .pipeline-board > *:nth-child(1) { --stagger-delay: 0ms; }
+  .stagger-children > *:nth-child(2), .subtab-grid > *:nth-child(2), .pipeline-board > *:nth-child(2) { --stagger-delay: 110ms; }
+  .stagger-children > *:nth-child(3), .subtab-grid > *:nth-child(3), .pipeline-board > *:nth-child(3) { --stagger-delay: 220ms; }
+  .stagger-children > *:nth-child(4), .subtab-grid > *:nth-child(4), .pipeline-board > *:nth-child(4) { --stagger-delay: 330ms; }
+  .stagger-children > *:nth-child(5), .subtab-grid > *:nth-child(5), .pipeline-board > *:nth-child(5) { --stagger-delay: 440ms; }
+  .stagger-children > *:nth-child(6), .subtab-grid > *:nth-child(6), .pipeline-board > *:nth-child(6) { --stagger-delay: 550ms; }
+  .stagger-children > *:nth-child(7), .subtab-grid > *:nth-child(7), .pipeline-board > *:nth-child(7) { --stagger-delay: 660ms; }
+  .stagger-children > *:nth-child(8), .subtab-grid > *:nth-child(8), .pipeline-board > *:nth-child(8) { --stagger-delay: 770ms; }
+  .stagger-children > *:nth-child(9), .subtab-grid > *:nth-child(9), .pipeline-board > *:nth-child(9) { --stagger-delay: 880ms; }
+  .stagger-children > *:nth-child(10), .subtab-grid > *:nth-child(10), .pipeline-board > *:nth-child(10) { --stagger-delay: 990ms; }
+  .stagger-children > *:nth-child(11), .subtab-grid > *:nth-child(11), .pipeline-board > *:nth-child(11) { --stagger-delay: 1100ms; }
+  .stagger-children > *:nth-child(12), .subtab-grid > *:nth-child(12), .pipeline-board > *:nth-child(12) { --stagger-delay: 1210ms; }
+  .stagger-children > *:nth-child(13) { --stagger-delay: 1440ms; }
+  .stagger-children > *:nth-child(14) { --stagger-delay: 1560ms; }
+  .stagger-children > *:nth-child(15) { --stagger-delay: 1680ms; }
+  .stagger-children > *:nth-child(16) { --stagger-delay: 1800ms; }
+
+  /* Delay utility helpers */
+  .delay-50 { --anim-delay: 50ms; }
+  .delay-100 { --anim-delay: 100ms; }
+  .delay-150 { --anim-delay: 150ms; }
+  .delay-200 { --anim-delay: 200ms; }
+  .delay-250 { --anim-delay: 250ms; }
+  .delay-300 { --anim-delay: 300ms; }
+  .delay-400 { --anim-delay: 400ms; }
+  .delay-500 { --anim-delay: 500ms; }
+
+  /* Legacy dash-delay classes mapped to the new motion delays */
+  .dash-delay-1 { --anim-delay: 80ms; }
+  .dash-delay-2 { --anim-delay: 160ms; }
+  .dash-delay-3 { --anim-delay: 240ms; }
+  .dash-delay-4 { --anim-delay: 320ms; }
+  .dash-delay-5 { --anim-delay: 400ms; }
+  .dash-delay-6 { --anim-delay: 480ms; }
+  .dash-delay-7 { --anim-delay: 560ms; }
+  .dash-delay-8 { --anim-delay: 640ms; }
+
+  /* =========================================================================
+     6. Fallback & Accessibility (prefers-reduced-motion)
+     ========================================================================= */
+  /* Fallback: if JS fails or disabled, ensure all content is immediately visible */
+  html:not(.js) .fade-up,
+  html:not(.js) .fade-down,
+  html:not(.js) .fade-left,
+  html:not(.js) .fade-right,
+  html:not(.js) .zoom-in,
+  html:not(.js) .center-reveal,
+  html:not(.js) [data-animate],
+  html:not(.js) .stagger-children > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Accessibility: respect user prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up,
+    .fade-down,
+    .fade-left,
+    .fade-right,
+    .zoom-in,
+    .center-reveal,
+    [data-animate],
+    .dash-animate-fade,
+    .stagger-children > * {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+      animation: none !important;
+    }
+    .skeleton::after, .spinner, .pulse, .float, .marquee__track {
+      animation-duration: 0s !important;
+      animation: none !important;
     }
   }
-  /* reduced motion: movement removed, simple fades kept */
-  html[data-reduced-motion] [data-animate] { --anim-name: fade-in !important; }
-  html[data-motion="off"] [data-animate] { animation: none !important; opacity: 1 !important; }
-  @media (prefers-reduced-motion: reduce) {
-    [data-animate] { --anim-name: fade-in !important; }
-    .skeleton::after, .spinner, .pulse, .float, .marquee__track { animation-duration: 0s !important; animation: none !important; }
+
+  html[data-reduced-motion] .fade-up,
+  html[data-reduced-motion] .fade-down,
+  html[data-reduced-motion] .fade-left,
+  html[data-reduced-motion] .fade-right,
+  html[data-reduced-motion] .zoom-in,
+  html[data-reduced-motion] .center-reveal,
+  html[data-reduced-motion] [data-animate],
+  html[data-motion="off"] .fade-up,
+  html[data-motion="off"] .fade-down,
+  html[data-motion="off"] .fade-left,
+  html[data-motion="off"] .fade-right,
+  html[data-motion="off"] .zoom-in,
+  html[data-motion="off"] .center-reveal,
+  html[data-motion="off"] [data-animate] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
   }
 
-  /* motion utilities */
+  /* Motion Utilities */
   .float { animation: float 6s ease-in-out infinite; }
   .shake { animation: shake var(--dur-slow) 2; }
   .pop { animation: pop var(--dur-base) var(--ease-spring); }
@@ -67,7 +295,7 @@
   .pulse-ring::after { animation-delay: 1s; }
   .gradient-spin:hover { animation: angle-spin 4s linear infinite; }
 
-  /* view transitions */
+  /* View transitions */
   @media (prefers-reduced-motion: no-preference) {
     ::view-transition-old(root) { animation: fade-out var(--dur-fast) var(--ease-out) both; }
     ::view-transition-new(root) { animation: vt-in var(--dur-base) var(--ease-out) both; }

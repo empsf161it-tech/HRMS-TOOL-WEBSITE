@@ -124,7 +124,7 @@ export default async function staffingView() {
   }
 
   const header = h('div', { class: 'dash-header' },
-    h('div', { class: 'dash-header__left' },
+    h('div', { class: 'dash-header__left fade-left', style: '--anim-delay: 50ms;' },
       h('div', { style: 'font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-bottom: 2px;' },
         h('span', null, 'Staffing / Deployments'),
         icon('chevron-right', { size: 12 }),
@@ -133,7 +133,7 @@ export default async function staffingView() {
       h('h1', { class: 'dash-header__title' }, 'Staffing & Deployments'),
       h('p', { class: 'dash-header__sub' }, 'Manage your client companies, deployed employees, timesheets, payroll and billing — all in one place.')
     ),
-    h('div', { class: 'dash-header__right', style: 'display: flex; align-items: center; gap: 10px;' },
+    h('div', { class: 'dash-header__right fade-right', style: 'display: flex; align-items: center; gap: 10px; --anim-delay: 90ms;' },
       h('div', { style: 'position: relative;' }, monthBtn),
       deployBtn
     )
@@ -149,10 +149,10 @@ export default async function staffingView() {
     { title: 'Gross Margin (This Month)', target: 12.3, prefix: '₹', suffix: 'L', trend: '↑ 14%', trendDir: 'up', sub: 'vs last month', iconBg: '#FFE4E6', iconColor: '#E11D48', iconName: 'line-chart' },
   ];
 
-  const kpisContainer = h('div', { class: 'kpi-grid' });
-  kpisData.forEach((k) => {
+  const kpisContainer = h('div', { class: 'kpi-grid stagger-children', dataset: { animateStagger: '90' } });
+  kpisData.forEach((k, idx) => {
     const valEl = h('div', { class: 'kpi-card__val' }, `${k.prefix}0${k.suffix}`);
-    const card = h('div', { class: 'kpi-card' },
+    const card = h('div', { class: 'kpi-card fade-up', style: `--anim-delay: ${idx * 85}ms;` },
       h('div', { class: 'kpi-card__top' },
         h('div', { class: 'kpi-card__icon-box', style: `background: ${k.iconBg}; color: ${k.iconColor};` },
           icon(k.iconName, { size: 18 })

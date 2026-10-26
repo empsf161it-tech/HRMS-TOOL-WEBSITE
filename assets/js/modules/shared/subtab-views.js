@@ -242,8 +242,8 @@ export function buildRecruitmentSubtab(tabName, employees, switchSubtab) {
     return container;
   }
 
-  // TAB: Interview Schedule
-  if (tabName === 'Interview Schedule') {
+  // TAB: Interview Schedule / Rounds
+  if (tabName === 'Interview Schedule' || tabName === 'Interview Rounds') {
     const interviews = [
       { time: 'Today, 3:30 PM - 4:30 PM', badge: 'Starts in 25 mins', cand: 'Rohan Gupta', role: 'Lead Full Stack', panel: 'Arun Kumar & Priya Sharma', type: 'Round 2: Architecture & Code', link: 'https://meet.google.com' },
       { time: 'Today, 5:00 PM - 6:00 PM', badge: 'Today', cand: 'Divya Pillai', role: 'Frontend Engineer', panel: 'Vikram S (Tech Lead)', type: 'Round 3: Live Problem Solving', link: 'https://meet.google.com' },
@@ -311,8 +311,8 @@ export function buildRecruitmentSubtab(tabName, employees, switchSubtab) {
     return container;
   }
 
-  // TAB: Offers & Joinings
-  if (tabName === 'Offers & Joinings') {
+  // TAB: Offers & Joinings / Offer Management
+  if (tabName === 'Offers & Joinings' || tabName === 'Offer Management') {
     const offers = [
       { name: 'Nikhil Roy', role: 'Lead Full Stack', ctc: '₹26,50,000', doj: 'Oct 15, 2026', status: 'Accepted', tag: 'green' },
       { name: 'Priyanka Kapoor', role: 'UI/UX Designer', ctc: '₹22,00,000', doj: 'Nov 01, 2026', status: 'Pending Signature', tag: 'blue' },
@@ -702,6 +702,334 @@ export function buildLeaveSubtab(tabName, employees, switchSubtab) {
       }, icon('download', { size: 15 }), `Export ${tabName} Data`)
     )
   );
+  return container;
+}
+
+/**
+ * 2.5 ATTENDANCE MODULE SUBTAB VIEWS (Daily Register, Monthly Muster, Regularization, Shift Roster, Reports)
+ */
+export function buildAttendanceSubtab(tabName, employees, switchSubtab) {
+  const container = h('div', { class: 'subtab-view' });
+
+  // 1. Daily Register
+  if (tabName === 'Daily Register' || tabName.includes('Register')) {
+    const records = [
+      { name: 'Vignesh Palanisamy', code: 'ELR-0001', dept: 'Operations', shift: 'General (09:00 - 18:00)', inTime: '09:04 AM', outTime: '18:02 PM', totalHours: '8.5 hrs', ot: '0.5 hrs', status: 'On Time', mode: 'Biometric Gate 1', pill: 'ready' },
+      { name: 'Kiran Verma', code: 'ELR-0002', dept: 'Operations', shift: 'General (09:00 - 18:00)', inTime: '09:12 AM', outTime: '18:08 PM', totalHours: '8.4 hrs', ot: '0.0 hrs', status: 'On Time', mode: 'Biometric Gate 2', pill: 'ready' },
+      { name: 'Sneha Krishnan', code: 'ELR-0003', dept: 'Operations', shift: 'General (09:00 - 18:00)', inTime: '09:28 AM', outTime: '18:30 PM', totalHours: '8.1 hrs', ot: '0.0 hrs', status: 'Late (Grace)', mode: 'Face Terminal HQ', pill: 'hold' },
+      { name: 'Suresh Kulkarni', code: 'ELR-0004', dept: 'Operations', shift: 'General (09:00 - 18:00)', inTime: '08:58 AM', outTime: '19:15 PM', totalHours: '9.8 hrs', ot: '1.8 hrs', status: 'On Time', mode: 'Biometric Gate 1', pill: 'ready' },
+      { name: 'Deepa Patel', code: 'ELR-0005', dept: 'Operations', shift: 'General (09:00 - 18:00)', inTime: '09:02 AM', outTime: '18:00 PM', totalHours: '8.0 hrs', ot: '0.0 hrs', status: 'On Time', mode: 'GPS Mobile Punch', pill: 'ready' },
+      { name: 'Nitin Varma', code: 'ELR-0006', dept: 'Operations', shift: 'Morning (06:00 - 14:30)', inTime: '06:05 AM', outTime: '14:35 PM', totalHours: '8.5 hrs', ot: '0.5 hrs', status: 'On Time', mode: 'Biometric Terminal', pill: 'ready' },
+      { name: 'Karthik Mukherjee', code: 'ELR-0007', dept: 'Operations', shift: 'General (09:00 - 18:00)', inTime: '09:05 AM', outTime: '18:10 PM', totalHours: '8.6 hrs', ot: '0.6 hrs', status: 'On Time', mode: 'Biometric Gate 1', pill: 'ready' },
+    ];
+
+    const middleGrid = h('div', { class: 'dash-middle-grid' });
+
+    const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Daily Attendance Punch Register · Today'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, 'Live biometric, face scanner & GPS geofenced mobile in/out timestamps.')
+        ),
+        h('div', { class: 'cluster gap-2' },
+          h('button', { class: 'btn btn--secondary btn--sm', type: 'button', onClick: () => toastSuccess('Exporting daily attendance register to XLSX…') }, icon('download', { size: 14 }), 'Export Register'),
+          h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Biometric terminals refreshed successfully.') }, icon('refresh-cw', { size: 14 }), 'Sync Devices')
+        )
+      ),
+      h('div', { class: 'dash-table-wrap' },
+        h('table', { class: 'dash-table' },
+          h('thead', null,
+            h('tr', null,
+              h('th', null, 'Employee'),
+              h('th', null, 'Shift Schedule'),
+              h('th', null, 'In Punch'),
+              h('th', null, 'Out Punch'),
+              h('th', null, 'Total Hours'),
+              h('th', null, 'Overtime'),
+              h('th', null, 'Verification Device'),
+              h('th', null, 'Status')
+            )
+          ),
+          h('tbody', null,
+            ...records.map((r) => h('tr', null,
+              h('td', null,
+                h('div', { class: 'table-emp-cell' },
+                  h('div', { class: 'table-emp-avatar-fallback' }, r.name[0]),
+                  h('div', { class: 'table-emp-meta' },
+                    h('span', { class: 'table-emp-name' }, r.name),
+                    h('span', { class: 'table-emp-id' }, r.code)
+                  )
+                )
+              ),
+              h('td', null, r.shift),
+              h('td', { style: 'font-weight: 700; color: #10B981;' }, r.inTime),
+              h('td', { style: 'font-weight: 600;' }, r.outTime),
+              h('td', { style: 'font-weight: 700;' }, r.totalHours),
+              h('td', { style: 'color: #1E60FF; font-weight: 600;' }, r.ot),
+              h('td', { style: 'font-size: 11.5px; color: var(--text-muted);' }, r.mode),
+              h('td', null, h('span', { class: `dash-status-pill dash-status-pill--${r.pill}` }, r.status))
+            ))
+          )
+        )
+      )
+    );
+
+    const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Daily Punctuality Health'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
+          h('div', { class: 'split', style: 'font-size: 12px;' }, h('span', null, 'On-Time Check-In'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '94.2% (378)')),
+          h('div', { style: 'height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden;' }, h('div', { style: 'height: 100%; width: 94.2%; background: #10B981; border-radius: 99px;' })),
+          h('div', { class: 'split', style: 'font-size: 12px;' }, h('span', null, 'Grace Period (15m)'), h('span', { style: 'font-weight: 700; color: #F59E0B;' }, '1.8% (6)')),
+          h('div', { style: 'height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden;' }, h('div', { style: 'height: 100%; width: 1.8%; background: #F59E0B; border-radius: 99px;' })),
+          h('div', { class: 'split', style: 'font-size: 12px;' }, h('span', null, 'Missed Out-Punches'), h('span', { style: 'font-weight: 700; color: #6366F1;' }, '0.4% (2)')),
+          h('div', { style: 'height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden;' }, h('div', { style: 'height: 100%; width: 0.4%; background: #6366F1; border-radius: 99px;' }))
+        )
+      ),
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Shift Supervisors on Duty'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
+          h('div', { class: 'watchlist-item' },
+            h('div', { class: 'cluster gap-2', style: 'align-items: center;' },
+              h('div', { style: 'width: 26px; height: 26px; border-radius: 50%; background: #1E60FF; color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center;' }, 'V'),
+              h('div', null, h('div', { style: 'font-weight: 600; font-size: 12px;' }, 'Vignesh Palanisamy'), h('div', { style: 'font-size: 11px; color: var(--text-muted);' }, 'General Shift · On Floor'))
+            ),
+            h('span', { style: 'font-size: 11px; font-weight: 700; color: #10B981;' }, 'Active')
+          ),
+          h('div', { class: 'watchlist-item' },
+            h('div', { class: 'cluster gap-2', style: 'align-items: center;' },
+              h('div', { style: 'width: 26px; height: 26px; border-radius: 50%; background: #10B981; color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center;' }, 'N'),
+              h('div', null, h('div', { style: 'font-weight: 600; font-size: 12px;' }, 'Nitin Varma'), h('div', { style: 'font-size: 11px; color: var(--text-muted);' }, 'Morning Shift · Support Eng.'))
+            ),
+            h('span', { style: 'font-size: 11px; font-weight: 700; color: #10B981;' }, 'Active')
+          )
+        )
+      )
+    );
+
+    middleGrid.append(leftCol, rightCol);
+    container.append(middleGrid);
+    return container;
+  }
+
+  // 2. Monthly Muster
+  if (tabName === 'Monthly Muster' || tabName.includes('Muster')) {
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const middleGrid = h('div', { class: 'dash-middle-grid' });
+
+    const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Monthly Attendance Muster Roll · September 2026'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, 'Statutory muster roll compliant with the Factories Act and Shops & Establishments Act.')
+        ),
+        h('div', { class: 'cluster gap-2' },
+          h('button', { class: 'btn btn--secondary btn--sm', type: 'button', onClick: () => toastSuccess('Exporting Form 25 Statutory Muster (Excel)…') }, icon('download', { size: 14 }), 'Export Form 25'),
+          h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #10B981;', onClick: () => toastSuccess('Muster Roll locked for September 2026 payroll calculation!') }, icon('lock', { size: 14 }), 'Lock Muster for Payroll')
+        )
+      ),
+      h('div', { class: 'dash-table-wrap' },
+        h('div', { style: 'overflow-x: auto; max-width: 100%;' },
+          h('table', { class: 'dash-table', style: 'font-size: 11.5px;' },
+            h('thead', null,
+              h('tr', null,
+                h('th', { style: 'position: sticky; left: 0; background: var(--surface-2); z-index: 2;' }, 'Employee'),
+                h('th', null, 'Total P'),
+                h('th', null, 'WO'),
+                h('th', null, 'Leave'),
+                h('th', null, 'Paid Days'),
+                ...days.slice(0, 16).map((d) => h('th', { style: 'text-align: center; width: 24px; padding: 6px 4px;' }, String(d)))
+              )
+            ),
+            h('tbody', null,
+              ...employees.slice(0, 6).map((emp) => h('tr', null,
+                h('td', { style: 'position: sticky; left: 0; background: var(--surface); z-index: 1; font-weight: 700;' }, emp.name),
+                h('td', { style: 'font-weight: 700; color: #10B981;' }, '22'),
+                h('td', null, '4'),
+                h('td', { style: 'color: #6366F1;' }, '1'),
+                h('td', { style: 'font-weight: 800; color: #1E60FF;' }, '26.0'),
+                ...days.slice(0, 16).map((d) => {
+                  const isSun = d % 7 === 0;
+                  const isLeave = d === 14;
+                  const val = isSun ? 'WO' : isLeave ? 'L' : 'P';
+                  const bg = isSun ? '#F1F5F9' : isLeave ? '#EDE9FE' : '#ECFDF5';
+                  const col = isSun ? '#64748B' : isLeave ? '#7C3AED' : '#059669';
+                  return h('td', { style: `text-align: center; padding: 4px; font-weight: 700; color: ${col}; background: ${bg}; border-radius: 4px; font-size: 10.5px;` }, val);
+                })
+              ))
+            )
+          )
+        )
+      )
+    );
+
+    const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Muster Status Checklist'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px; font-size: 12px;' },
+          h('div', { class: 'split' }, h('span', null, 'Biometric Reconciled'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '100% ✓')),
+          h('div', { class: 'split' }, h('span', null, 'Regularizations Cleared'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '42/42 ✓')),
+          h('div', { class: 'split' }, h('span', null, 'Leave Quota Deducted'), h('span', { style: 'font-weight: 700; color: #10B981;' }, 'Verified ✓')),
+          h('div', { class: 'split' }, h('span', null, 'Payroll Sign-off'), h('span', { style: 'font-weight: 700; color: #F59E0B;' }, 'Pending Lock'))
+        )
+      ),
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Muster Summary Legends'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 6px; font-size: 11.5px;' },
+          h('div', { class: 'cluster gap-2' }, h('span', { style: 'padding: 2px 6px; background: #ECFDF5; color: #059669; font-weight: 700; border-radius: 4px;' }, 'P'), h('span', null, 'Present (Full Day Paid)')),
+          h('div', { class: 'cluster gap-2' }, h('span', { style: 'padding: 2px 6px; background: #EDE9FE; color: #7C3AED; font-weight: 700; border-radius: 4px;' }, 'L'), h('span', null, 'Approved Leave (Paid)')),
+          h('div', { class: 'cluster gap-2' }, h('span', { style: 'padding: 2px 6px; background: #F1F5F9; color: #64748B; font-weight: 700; border-radius: 4px;' }, 'WO'), h('span', null, 'Weekly Off (Rest Day)')),
+          h('div', { class: 'cluster gap-2' }, h('span', { style: 'padding: 2px 6px; background: #FEE2E2; color: #DC2626; font-weight: 700; border-radius: 4px;' }, 'A'), h('span', null, 'Loss of Pay / Absent'))
+        )
+      )
+    );
+
+    middleGrid.append(leftCol, rightCol);
+    container.append(middleGrid);
+    return container;
+  }
+
+  // 3. Regularization Requests
+  if (tabName.includes('Regularization')) {
+    const requests = [
+      { id: 'REG-101', name: 'Vignesh Palanisamy', code: 'ELR-0001', dept: 'Operations', date: 'Sep 24, 2026', type: 'Missing Out-Punch', reason: 'Client sprint retrospective ran late until 20:30 IST; missed terminal swipe.', punchTime: 'Expected: 18:00 · Actual Out: 20:30', status: 'Pending Approval' },
+      { id: 'REG-102', name: 'Karthik Mukherjee', code: 'ELR-0007', dept: 'Operations', date: 'Sep 23, 2026', type: 'On-Duty Client Visit', reason: 'Onsite deployment at Infosys campus; outdoor geotag verified.', punchTime: 'Full Day On-Duty', status: 'Pending Approval' },
+      { id: 'REG-103', name: 'Deepa Patel', code: 'ELR-0005', dept: 'Operations', date: 'Sep 22, 2026', type: 'Biometric Scanner Timeout', reason: 'Optical scanner at Gate #2 failed to register fingerprint punch.', punchTime: 'In-Punch: 09:05 AM', status: 'Pending Approval' },
+    ];
+
+    const middleGrid = h('div', { class: 'dash-middle-grid' });
+
+    const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Attendance Regularization Approvals Queue'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, 'Review and sanction missed punch and outdoor on-duty attendance correction requests.')
+        ),
+        h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Bulk approved 3 regularization requests!') }, icon('check-check', { size: 14 }), 'Approve All Pending')
+      ),
+      h('div', { style: 'display: flex; flex-direction: column; gap: 12px;' },
+        ...requests.map((r) => {
+          const card = h('div', { class: 'interactive-card' });
+          card.append(
+            h('div', { class: 'interactive-card__head' },
+              h('div', { class: 'cluster gap-2', style: 'align-items: center;' },
+                h('div', { style: 'width: 36px; height: 36px; border-radius: 50%; background: #2563EB; color: #fff; font-weight: 700; display: grid; place-items: center;' }, r.name[0]),
+                h('div', null,
+                  h('h4', { class: 'interactive-card__title' }, r.name),
+                  h('div', { class: 'interactive-card__sub' }, `${r.dept} · ${r.code}`)
+                )
+              ),
+              h('span', { class: 'interactive-card__tag tag--amber' }, r.type)
+            ),
+            h('div', { style: 'font-size: 12.5px; color: var(--text-muted); line-height: 1.45;' },
+              h('strong', { style: 'color: var(--text);' }, `Date: ${r.date} — `),
+              r.reason
+            ),
+            h('div', { style: 'font-size: 11.5px; color: #1E60FF; font-weight: 600;' }, r.punchTime),
+            h('div', { class: 'split gap-2', style: 'border-top: 1px solid var(--border); padding-top: 8px;' },
+              h('button', { class: 'btn btn--ghost btn--sm', type: 'button', onClick: () => { toastSuccess(`Rejected regularization for ${r.name}`); card.remove(); } }, 'Reject'),
+              h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #10B981;', onClick: () => { toastSuccess(`Regularization approved for ${r.name}! Attendance ledger updated.`); card.remove(); } }, icon('check', { size: 14 }), 'Approve Correction')
+            )
+          );
+          return card;
+        })
+      )
+    );
+
+    const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Regularization Policy Rules'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-muted);' },
+          h('div', null, '• Maximum 3 regularizations permitted per employee per calendar month.'),
+          h('div', null, '• Must be submitted within 48 hours of the missed punch incident.'),
+          h('div', null, '• Geofence logs and biometric failure timestamps are automatically reconciled.')
+        )
+      )
+    );
+
+    middleGrid.append(leftCol, rightCol);
+    container.append(middleGrid);
+    return container;
+  }
+
+  // 4. Shift Roster
+  if (tabName.includes('Roster') || tabName.includes('Shift')) {
+    const shifts = [
+      { name: 'General Shift (GS)', timing: '09:00 AM - 06:00 PM', assigned: 312, color: '#1E60FF' },
+      { name: 'Morning Shift (MS)', timing: '06:00 AM - 02:30 PM', assigned: 48, color: '#10B981' },
+      { name: 'Evening Shift (ES)', timing: '02:00 PM - 10:30 PM', assigned: 56, color: '#F59E0B' },
+      { name: 'Night Shift (NS)', timing: '10:00 PM - 06:30 AM', assigned: 12, color: '#8B5CF6' },
+    ];
+
+    const cards = h('div', { class: 'subtab-grid' });
+    shifts.forEach((s) => {
+      cards.append(h('div', { class: 'interactive-card' },
+        h('div', { class: 'interactive-card__head' },
+          h('h4', { class: 'interactive-card__title' }, s.name),
+          h('span', { class: 'skill-chip', style: 'color: #1E60FF; font-weight: 700;' }, `${s.assigned} Assigned`)
+        ),
+        h('div', { class: 'cluster gap-2', style: 'font-size: 13px; font-weight: 600;' },
+          icon('clock', { size: 14, style: `color: ${s.color};` }),
+          h('span', null, s.timing)
+        ),
+        h('div', { class: 'split gap-2', style: 'border-top: 1px solid var(--border); padding-top: 8px; margin-top: 6px;' },
+          h('button', { class: 'btn btn--ghost btn--sm', type: 'button', onClick: () => toastSuccess(`Viewing roster members for ${s.name}`) }, 'View Members'),
+          h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess(`Shift roster allocation opened for ${s.name}`) }, 'Assign Staff')
+        )
+      ));
+    });
+
+    container.append(
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Active Shift Roster Master & Coverage'),
+        h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Shift creation dialog opened!') }, icon('plus', { size: 14 }), 'Add Shift Definition')
+      ),
+      cards
+    );
+    return container;
+  }
+
+  // 5. Reports & Analytics
+  const middleGrid = h('div', { class: 'dash-middle-grid' });
+  const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+    h('div', { class: 'interactive-card', style: 'padding: 24px;' },
+      h('h3', { style: 'font-size: 16px; font-weight: 700; margin: 0 0 14px; color: var(--text);' }, 'Attendance Analytics & Trends · September 2026'),
+      h('div', { style: 'display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;' },
+        h('div', { style: 'padding: 12px; background: var(--surface-2); border-radius: 10px;' },
+          h('div', { style: 'font-size: 12px; color: var(--text-muted);' }, 'Avg Monthly Attendance'),
+          h('div', { style: 'font-size: 24px; font-weight: 800; color: #10B981;' }, '94.2%'),
+          h('div', { style: 'font-size: 11px; color: #10B981;' }, '↑ 1.8% vs last month')
+        ),
+        h('div', { style: 'padding: 12px; background: var(--surface-2); border-radius: 10px;' },
+          h('div', { style: 'font-size: 12px; color: var(--text-muted);' }, 'Overtime Total Hours'),
+          h('div', { style: 'font-size: 24px; font-weight: 800; color: #1E60FF;' }, '142 hrs'),
+          h('div', { style: 'font-size: 11px; color: #1E60FF;' }, '₹48,200 estimated payout')
+        ),
+        h('div', { style: 'padding: 12px; background: var(--surface-2); border-radius: 10px;' },
+          h('div', { style: 'font-size: 12px; color: var(--text-muted);' }, 'Late Arrival Frequency'),
+          h('div', { style: 'font-size: 24px; font-weight: 800; color: #F59E0B;' }, '1.4%'),
+          h('div', { style: 'font-size: 11px; color: #10B981;' }, '↓ 0.6% improvement')
+        )
+      ),
+      h('div', { class: 'cluster gap-2' },
+        h('button', { class: 'btn btn--primary', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Exporting Monthly Attendance Report (PDF)…') }, icon('download', { size: 15 }), 'Download Report (PDF)'),
+        h('button', { class: 'btn btn--secondary', type: 'button', onClick: () => toastSuccess('Exporting Raw Punch Log CSV…') }, icon('file-spreadsheet', { size: 15 }), 'Export Raw CSV')
+      )
+    )
+  );
+
+  const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+    h('div', { class: 'kpi-card' },
+      h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Compliance Auditing'),
+      h('p', { style: 'font-size: 12.5px; color: var(--text-muted); line-height: 1.45; margin: 0 0 12px;' },
+        'All muster logs, regularization approvals and timestamp modifications are digitally signed and audit-ready.'
+      ),
+      h('button', { class: 'btn btn--secondary btn--sm', type: 'button', style: 'width: 100%;', onClick: () => toastSuccess('Compliance certificate generated.') }, icon('shield-check', { size: 14 }), 'Generate Audit Certificate')
+    )
+  );
+
+  middleGrid.append(leftCol, rightCol);
+  container.append(middleGrid);
   return container;
 }
 

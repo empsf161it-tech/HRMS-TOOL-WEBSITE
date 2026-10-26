@@ -19,25 +19,80 @@ export function applyMotion(cfg) {
 /** Prefer-reduced-motion check including the config policy. */
 export const motionReduced = () => document.documentElement.hasAttribute('data-reduced-motion') || document.documentElement.dataset.motion === 'off';
 
-/** Observe [data-animate] elements: adds .is-visible once, applies delay/duration/stagger attributes. */
+/**
+ * Observe elements with 4-direction animation classes or [data-animate] attributes.
+ * Adds .is-visible once when element enters the viewport via IntersectionObserver.
+ * Also configures automated stagger delays for .stagger-children and [data-animate-stagger].
+ */
 export function observeReveals(root = document) {
-  const els = [...root.querySelectorAll('[data-animate]')];
+  if (motionReduced()) {
+    const all = root.querySelectorAll?.('.fade-up, .fade-down, .fade-left, .fade-right, .zoom-in, .center-reveal, [data-animate], .dash-animate-fade, .stagger-children > *') || [];
+    all.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  // 1. Process stagger containers (.stagger-children, [data-animate-stagger], .subtab-grid, .pipeline-board)
+  const staggerContainers = root.querySelectorAll?.('.stagger-children, [data-animate-stagger], .subtab-grid, .pipeline-board') || [];
+  staggerContainers.forEach((container) => {
+    const step = +container.dataset.animateStagger || 110;
+    const defaultAnim = container.dataset.animateChild || 'fade-up';
+    const children = [...container.children];
+    children.forEach((child, idx) => {
+      // Ensure child has an animation class if none specified
+      const hasAnim = child.matches('.fade-up, .fade-down, .fade-left, .fade-right, .zoom-in, .center-reveal, [data-animate], .interactive-card, .pipeline-col');
+      if (!hasAnim) {
+        child.classList.add(defaultAnim);
+      }
+      child.style.setProperty('--anim-delay', `${idx * step}ms`);
+      child.style.setProperty('--stagger-delay', `${idx * step}ms`);
+    });
+  });
+
+  // 2. Query all animatable elements in the root
+  const selector = '.fade-up, .fade-down, .fade-left, .fade-right, .zoom-in, .center-reveal, [data-animate], .dash-animate-fade, .interactive-card, .pipeline-col';
+  const els = root.querySelectorAll ? [...root.querySelectorAll(selector)] : [];
+  if (root.matches && root.matches(selector)) {
+    els.unshift(root);
+  }
+
+  // Apply explicit delay/duration overrides from data attributes
   els.forEach((el) => {
     if (el.dataset.animateDelay) el.style.setProperty('--anim-delay', `${el.dataset.animateDelay}ms`);
     if (el.dataset.animateDuration) el.style.setProperty('--anim-dur', `${el.dataset.animateDuration}ms`);
   });
-  root.querySelectorAll('[data-animate-stagger]').forEach((p) => {
-    const step = +p.dataset.animateStagger || 60;
-    [...p.children].forEach((c, i) => { if (c.hasAttribute('data-animate')) c.style.setProperty('--anim-delay', `${i * step}ms`); });
+
+  // 3. Setup lightweight, high-performance IntersectionObserver
+  io ??= new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, {
+    root: null,
+    threshold: [0, 0.08, 0.15],
+    rootMargin: '0px 0px -40px 0px'
   });
-  if (document.documentElement.hasAttribute('data-scroll-driven')) return;
-  io ??= new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } }), { threshold: 0.12 });
-  els.forEach((el) => { if (!el.classList.contains('is-visible')) io.observe(el); });
+
+  // Observe every unrevealed element
+  els.forEach((el) => {
+    if (!el.classList.contains('is-visible')) {
+      io.observe(el);
+    }
+  });
 }
+
+// Auto-wire with the application route changes
+bus.on('route-change', () => {
+  requestAnimationFrame(() => {
+    setTimeout(() => observeReveals(document), 30);
+  });
+});
 
 /** Re-run entrance animations inside a root (Control Center "Replay"). */
 export function replayAnimations(root = document) {
-  root.querySelectorAll('[data-animate]').forEach((el) => el.classList.remove('is-visible'));
+  root.querySelectorAll('.fade-up, .fade-down, .fade-left, .fade-right, .zoom-in, .center-reveal, [data-animate], .dash-animate-fade').forEach((el) => el.classList.remove('is-visible'));
   requestAnimationFrame(() => requestAnimationFrame(() => observeReveals(root)));
 }
 
