@@ -1,0 +1,24 @@
+/* Purpose: modern minimal CSS reset (layer: reset). */
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; }
+  html { -webkit-tap-highlight-color: transparent; }
+  body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  img, picture, video, canvas, svg { display: block; max-inline-size: 100%; }
+  img { block-size: auto; }
+  input, button, textarea, select { font: inherit; color: inherit; letter-spacing: inherit; }
+  button { cursor: pointer; background: none; border: 0; padding: 0; }
+  button:disabled { cursor: not-allowed; }
+  a { color: inherit; }
+  ul[role="list"], ol[role="list"], ul.plain, ol.plain { list-style: none; padding: 0; }
+  p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+  table { border-collapse: collapse; border-spacing: 0; }
+  fieldset { border: 0; padding: 0; min-inline-size: 0; }
+  summary { cursor: pointer; }
+  dialog { color: inherit; }
+  [popover] { margin: 0; padding: 0; border: 0; color: inherit; background: transparent; }
+  :where([hidden]:not([hidden="until-found"])) { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+}

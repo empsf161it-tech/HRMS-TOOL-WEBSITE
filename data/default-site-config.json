@@ -1,0 +1,75 @@
+{
+  "meta": { "schema": 1, "name": "Ellowring site config" },
+  "brand": {
+    "name": "ELLOWRING",
+    "tagline": "People. Performance. Possibilities.",
+    "logoLight": "assets/images/logo-light.svg",
+    "logoDark": "assets/images/logo-dark.svg",
+    "favicon": "assets/images/favicon.svg",
+    "appIcon": "assets/images/icon-512.svg",
+    "social": { "linkedin": "https://www.linkedin.com/company/ellowring", "x": "https://x.com/ellowring", "youtube": "https://www.youtube.com/@ellowring" },
+    "contact": { "email": "hello@ellowring.in", "phone": "+91 44 4000 1200", "address": "4th Floor, Olympia Tech Park, Guindy, Chennai 600032" }
+  },
+  "theme": {
+    "preset": "ellowring",
+    "radius": { "sm": 6, "md": 10, "lg": 14, "xl": 20 },
+    "light": {
+      "primary": "#1E60FF", "secondary": "#0284C7", "accent": "#F59E0B",
+      "success": "#10B981", "warning": "#F59E0B", "danger": "#EF4444", "info": "#06B6D4",
+      "bg": "#F8FAFC", "surface": "#FFFFFF", "surface2": "#F1F5F9", "border": "#E2E8F0", "text": "#0F172A", "textMuted": "#64748B"
+    },
+    "dark": {
+      "primary": "#3B82F6", "secondary": "#38BDF8", "accent": "#F59E0B",
+      "success": "#10B981", "warning": "#FBBF24", "danger": "#EF4444", "info": "#38BDF8",
+      "bg": "#0B132B", "surface": "#111C3A", "surface2": "#1A274E", "border": "#1E2E5D", "text": "#F8FAFC", "textMuted": "#94A3B8"
+    },
+    "hc": {
+      "primary": "#FFD400", "secondary": "#00E5FF", "accent": "#FF9F1C",
+      "success": "#00FF7F", "warning": "#FFD400", "danger": "#FF6B6B", "info": "#00E5FF",
+      "bg": "#000000", "surface": "#000000", "surface2": "#141414", "border": "#FFFFFF", "text": "#FFFFFF", "textMuted": "#E6E6E6"
+    },
+    "gradient": { "angle": 135 },
+    "presets": {
+      "ellowring": { "label": "Ellowring Official", "light": { "primary": "#1E60FF", "secondary": "#0284C7", "accent": "#F59E0B", "success": "#10B981", "danger": "#EF4444" }, "dark": { "primary": "#3B82F6", "secondary": "#38BDF8", "accent": "#F59E0B", "success": "#10B981", "danger": "#EF4444" } }
+    }
+  },
+  "typography": {
+    "heading": "Plus Jakarta Sans", "body": "Inter", "mono": "JetBrains Mono",
+    "baseSize": 15, "scaleRatio": 1.25, "lineHeight": 1.5, "headingLineHeight": 1.2,
+    "letterSpacing": -0.015, "headingCase": "none"
+  },
+  "buttons": {
+    "primary":   { "radius": "", "hoverEffect": "lift", "pressEffect": "scale" },
+    "secondary": { "radius": "", "hoverEffect": "lift", "pressEffect": "scale" },
+    "outline":   { "radius": "", "hoverEffect": "none", "pressEffect": "scale" },
+    "ghost":     { "radius": "", "hoverEffect": "none", "pressEffect": "scale" },
+    "danger":    { "radius": "", "hoverEffect": "lift", "pressEffect": "scale" }
+  },
+  "components": {
+    "card": { "glass": false },
+    "table": { "zebra": false, "headerStyle": "subtle" },
+    "sidebar": { "style": "dark", "width": 260, "iconOnly": false },
+    "header": { "style": "solid" }
+  },
+  "layout": { "density": "comfortable", "defaultLanding": { "super_admin": "/home", "hr_admin": "/home", "branch_hr": "/home", "payroll_admin": "/home", "recruiter": "/home", "manager": "/home", "employee": "/home", "site_admin": "/home" } },
+  "animations": {
+    "enabled": true, "speed": 1, "easing": "ease-out", "reducedMotion": "respect", "scrollDriven": true,
+    "toggles": { "heroBackground": true, "counters": true, "marquee": true, "magneticButtons": true, "pageTransitions": true, "confetti": true, "cursorFollower": false }
+  },
+  "app": {
+    "welcomeText": "Welcome back, {{employee.firstName}}",
+    "loginBackground": "aurora",
+    "dashboardWidgets": { "admin": ["kpis", "attendance", "headcount", "events", "approvals", "feed"], "employee": ["punch", "balances", "holidays", "payslip", "announcements"] }
+  },
+  "modules": { "enabled": {}, "labels": {}, "order": [], "industries": ["hospitality", "manufacturing", "retail", "it", "education", "construction", "healthcare", "logistics"], "defaultIndustry": "it" },
+  "locale": {
+    "language": "en", "locale": "en-IN", "currency": "INR", "timezone": "Asia/Kolkata", "dateFormat": "DD-MM-YYYY",
+    "languages": [ { "code": "en", "label": "English", "dir": "ltr" }, { "code": "hi", "label": "हिन्दी", "dir": "ltr" }, { "code": "ta", "label": "தமிழ்", "dir": "ltr" } ]
+  },
+  "content": {},
+  "media": [],
+  "navigation": {},
+  "footer": {},
+  "seo": {},
+  "i18n": {}
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ELLOWRING HRMS · Enterprise Multi-Industry Workforce Platform</title>
+  <meta name="description" content="ELLOWRING Multi-Industry HRMS: 30 integrated HR modules covering biometric devices, GPS geo-fencing, payroll and statutory compliance for India.">
+  <meta name="theme-color" content="#5414B8">
+
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net;
+    font-src 'self' data: https://fonts.gstatic.com;
+    img-src 'self' data: blob: https://*.tile.openstreetmap.org https://unpkg.com;
+    media-src 'self' blob:;
+    frame-src 'self' blob: data:;
+    worker-src 'self' blob:;
+    connect-src 'self' https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+  ">
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg">
+  <link rel="manifest" href="../manifest.webmanifest">
+
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link id="eh-fonts" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@600;700&display=swap">
+
+  <!-- Prevent Theme Flash -->
+  <script src="../assets/js/core/boot-theme.js"></script>
+
+  <!-- Core Layered Stylesheet -->
+  <link rel="stylesheet" href="../assets/css/app.css">
+</head>
+<body>
+  <!-- Initial Splash Screen -->
+  <div id="splash" class="splash" role="status" aria-label="Loading ELLOWRING HRMS">
+    <div class="stack gap-3 text-center" style="align-items:center">
+      <svg class="splash__mark" viewBox="0 0 100 100" width="68" height="68" aria-hidden="true">
+        <defs>
+          <filter id="splash-sh" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#000" flood-opacity="0.25"/>
+          </filter>
+          <filter id="splash-dsh" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#000" flood-opacity="0.28"/>
+          </filter>
+          <linearGradient id="sp-red" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FF3843"/><stop offset="60%" stop-color="#E51821"/><stop offset="100%" stop-color="#B30911"/>
+          </linearGradient>
+          <linearGradient id="sp-purple" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#7028E4"/><stop offset="60%" stop-color="#5414B8"/><stop offset="100%" stop-color="#360882"/>
+          </linearGradient>
+          <linearGradient id="sp-blue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#14B8FF"/><stop offset="60%" stop-color="#00A3E0"/><stop offset="100%" stop-color="#0077B6"/>
+          </linearGradient>
+          <linearGradient id="sp-green" x1="1" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#009618"/><stop offset="60%" stop-color="#00B824"/><stop offset="100%" stop-color="#2AE252"/>
+          </linearGradient>
+          <linearGradient id="sp-yellow" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stop-color="#EAA600"/><stop offset="60%" stop-color="#FFC500"/><stop offset="100%" stop-color="#FFE169"/>
+          </linearGradient>
+          <linearGradient id="sp-disc" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFFFFF"/><stop offset="70%" stop-color="#F1F5F9"/><stop offset="100%" stop-color="#CBD5E1"/>
+          </linearGradient>
+          <linearGradient id="sp-gloss" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8"/><stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.2"/><stop offset="100%" stop-color="#000000" stop-opacity="0.25"/>
+          </linearGradient>
+        </defs>
+        <g filter="url(#splash-sh)">
+          <path d="M 50.00 6.00 A 44 44 0 0 1 91.85 36.40 L 72.83 42.58 A 24 24 0 0 0 50.00 26.00 Z" fill="url(#sp-red)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.6"/>
+          <path d="M 91.85 36.40 A 44 44 0 0 1 75.86 85.60 L 64.11 69.42 A 24 24 0 0 0 72.83 42.58 Z" fill="url(#sp-purple)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.6"/>
+          <path d="M 75.86 85.60 A 44 44 0 0 1 24.14 85.60 L 35.89 69.42 A 24 24 0 0 0 64.11 69.42 Z" fill="url(#sp-blue)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.6"/>
+          <path d="M 24.14 85.60 A 44 44 0 0 1 8.15 36.40 L 27.17 42.58 A 24 24 0 0 0 35.89 69.42 Z" fill="url(#sp-green)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.6"/>
+          <path d="M 8.15 36.40 A 44 44 0 0 1 50.00 6.00 L 50.00 26.00 A 24 24 0 0 0 27.17 42.58 Z" fill="url(#sp-yellow)" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="0.6"/>
+          <circle cx="50" cy="50" r="34" fill="none" stroke="url(#sp-gloss)" stroke-width="2.6" opacity="0.65"/>
+        </g>
+        <g filter="url(#splash-dsh)">
+          <circle cx="50" cy="50" r="14" fill="url(#sp-disc)" stroke="#FFFFFF" stroke-width="1.2"/>
+          <circle cx="50" cy="49" r="12.5" fill="none" stroke="#FFFFFF" stroke-width="0.75" opacity="0.8"/>
+        </g>
+      </svg>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;letter-spacing:0.04em;color:var(--text)">ELLOWRING</div>
+      <div style="font-size:13px;color:var(--text-muted)">Loading your workspace…</div>
+    </div>
+  </div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="../assets/js/app.js"></script>
+</body>
+</html>

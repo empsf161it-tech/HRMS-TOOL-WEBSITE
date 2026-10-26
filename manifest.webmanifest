@@ -1,0 +1,23 @@
+{
+  "name": "ELLOWRING HRMS",
+  "short_name": "ELLOWRING",
+  "description": "Multi-industry HRMS built for India",
+  "start_url": "/app/#/home",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050B1A",
+  "theme_color": "#5414B8",
+  "icons": [
+    {
+      "src": "assets/images/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+/* Purpose: single stylesheet entry. layers.css MUST come first so the cascade-layer order is fixed before any rule is parsed. */
+@import url("layers.css");
+@import url("reset.css");
+@import url("tokens.css");
+@import url("base.css");
+@import url("layout.css");
+@import url("animations.css");
+@import url("components/button.css");
+@import url("components/display.css");
+@import url("components/feedback.css");
+@import url("components/overlay.css");
+@import url("components/form.css");
+@import url("components/data.css");
+@import url("components/nav.css");
+@import url("components/pages.css");
+@import url("utilities.css");
+@import url("themes/light.css");
+@import url("themes/dark.css");
+@import url("themes/high-contrast.css");

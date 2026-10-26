@@ -1,0 +1,80 @@
+/* Purpose: all keyframes and the data-animate motion system (layer: components). Only transform/opacity are animated. */
+@layer components {
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes fade-down { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+  @keyframes slide-left { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
+  @keyframes slide-right { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
+  @keyframes zoom { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+  @keyframes blur { from { opacity: 0; filter: blur(12px); } to { opacity: 1; filter: none; } }
+  @keyframes flip { from { opacity: 0; transform: perspective(600px) rotateX(-18deg); } to { opacity: 1; transform: none; } }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+  @keyframes pulse-ring { 0% { transform: scale(.9); opacity: .7; } 100% { transform: scale(1.5); opacity: 0; } }
+  @keyframes wiggle { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-14deg); } 40% { transform: rotate(12deg); } 60% { transform: rotate(-8deg); } 80% { transform: rotate(5deg); } }
+  @keyframes pop { 0% { transform: scale(.4); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes marquee { to { transform: translateX(calc(-50% - var(--space-4))); } }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes drift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -30px) scale(1.15); } }
+  @keyframes angle-spin { to { --angle: 495deg; } }
+  @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+  @keyframes slide-down { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+  [data-animate] { --anim-name: fade-up; }
+  [data-animate="fade-in"] { --anim-name: fade-in; }
+  [data-animate="fade-up"] { --anim-name: fade-up; }
+  [data-animate="fade-down"] { --anim-name: fade-down; }
+  [data-animate="slide-left"] { --anim-name: slide-left; }
+  [data-animate="slide-right"] { --anim-name: slide-right; }
+  [data-animate="zoom"], [data-animate="scale-in"] { --anim-name: zoom; }
+  [data-animate="blur"], [data-animate="blur-in"] { --anim-name: blur; }
+  [data-animate="flip"] { --anim-name: flip; }
+  [data-animate="none"] { --anim-name: none; }
+
+  /* time-based reveal (IntersectionObserver adds .is-visible) */
+  html.js:not([data-scroll-driven]) [data-animate]:not(.is-visible) { opacity: 0; }
+  html.js:not([data-scroll-driven]) [data-animate].is-visible {
+    animation-name: var(--anim-name); animation-duration: var(--anim-dur, var(--dur-slow));
+    animation-delay: var(--anim-delay, 0ms); animation-timing-function: var(--ease-out); animation-fill-mode: both;
+  }
+  /* scroll-driven reveal where supported */
+  @supports (animation-timeline: view()) {
+    html[data-scroll-driven] [data-animate] {
+      animation-name: var(--anim-name); animation-timeline: view(); animation-range: entry 4% cover 26%;
+      animation-fill-mode: both; animation-timing-function: var(--ease-out); animation-duration: 1ms;
+    }
+  }
+  /* reduced motion: movement removed, simple fades kept */
+  html[data-reduced-motion] [data-animate] { --anim-name: fade-in !important; }
+  html[data-motion="off"] [data-animate] { animation: none !important; opacity: 1 !important; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate] { --anim-name: fade-in !important; }
+    .skeleton::after, .spinner, .pulse, .float, .marquee__track { animation-duration: 0s !important; animation: none !important; }
+  }
+
+  /* motion utilities */
+  .float { animation: float 6s ease-in-out infinite; }
+  .shake { animation: shake var(--dur-slow) 2; }
+  .pop { animation: pop var(--dur-base) var(--ease-spring); }
+  .wiggle { animation: wiggle .8s var(--ease-out); transform-origin: top center; }
+  .pulse-ring { position: relative; }
+  .pulse-ring::before, .pulse-ring::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid currentColor;
+    animation: pulse-ring 2s ease-out infinite; pointer-events: none;
+  }
+  .pulse-ring::after { animation-delay: 1s; }
+  .gradient-spin:hover { animation: angle-spin 4s linear infinite; }
+
+  /* view transitions */
+  @media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root) { animation: fade-out var(--dur-fast) var(--ease-out) both; }
+    ::view-transition-new(root) { animation: vt-in var(--dur-base) var(--ease-out) both; }
+    html.vt-theme::view-transition-old(root), html.vt-theme::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    html.vt-theme::view-transition-new(root) { z-index: 9999; }
+  }
+  @keyframes fade-out { to { opacity: 0; } }
+  @keyframes vt-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  ::view-transition-group(emp-avatar) { animation-duration: var(--dur-slow); }
+}

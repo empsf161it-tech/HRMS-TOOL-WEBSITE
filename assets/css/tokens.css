@@ -1,0 +1,73 @@
+/* Purpose: design tokens (defaults). Colors/fonts/radii are overwritten at runtime by theme-engine.js from the site config. */
+@property --angle { syntax: "<angle>"; inherits: false; initial-value: 135deg; }
+@property --sweep { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
+
+@layer tokens {
+  :root {
+    /* spacing: 4px base scale */
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px;
+    --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px;
+    --space-fluid: clamp(var(--space-4), 2vw + .5rem, var(--space-8));
+
+    /* radius */
+    --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-xl: 24px; --radius-full: 999px;
+
+    /* motion (speed factor is written by motion-engine; 1000 = effectively off) */
+    --motion-speed: 1;
+    --dur-fast: calc(120ms / var(--motion-speed));
+    --dur-base: calc(220ms / var(--motion-speed));
+    --dur-slow: calc(400ms / var(--motion-speed));
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+    /* z-index */
+    --z-dropdown: 100; --z-sticky: 200; --z-drawer: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+
+    /* typography */
+    --font-heading: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    --text-base: 16px;
+    --type-scale: 1;
+    --text-xs: calc(var(--text-base) * .75);
+    --text-sm: calc(var(--text-base) * .875);
+    --text-lg: calc(clamp(18px, 1.05rem + .15vw, 20px) * var(--type-scale));
+    --text-xl: calc(clamp(20px, 1.15rem + .35vw, 24px) * var(--type-scale));
+    --text-2xl: calc(clamp(24px, 1.3rem + .7vw, 30px) * var(--type-scale));
+    --text-3xl: calc(clamp(30px, 1.6rem + 1.2vw, 40px) * var(--type-scale));
+    --text-display: calc(clamp(40px, 2rem + 3.2vw, 72px) * var(--type-scale));
+    --lh-body: 1.5; --lh-heading: 1.15; --ls-display: -0.02em; --heading-case: none;
+
+    /* density */
+    --row-h: 52px; --control-h: 42px; --cell-pad: var(--space-3) var(--space-4);
+
+    /* shell sizes */
+    --sidebar-w: 264px; --sidebar-w-collapsed: 72px; --header-h: 64px; --bottom-nav-h: 64px;
+    --target-min: 44px;
+
+    /* Ellowring official 5-sector logo colors */
+    --logo-red: #E51821;
+    --logo-purple: #5414B8;
+    --logo-blue: #00A3E0;
+    --logo-green: #00B824;
+    --logo-yellow: #FFC500;
+    --logo-navy: #051538;
+
+    /* attendance statuses: fixed semantic tokens shared by calendars, badges, legends and charts */
+    --st-present: light-dark(#00b824, #2ae252);
+    --st-absent: light-dark(#e51821, #ff4d57);
+    --st-halfday: light-dark(#ff9e00, #fbbf24);
+    --st-late: light-dark(#ffc500, #fcd34d);
+    --st-leave: light-dark(#5414b8, #8b5cf6);
+    --st-holiday: light-dark(#7028e4, #a78bfa);
+    --st-weekoff: light-dark(#5a6b8a, #94a3b8);
+    --st-wfh: light-dark(#00a3e0, #38bdf8);
+    --st-onduty: light-dark(#0284c7, #22d3ee);
+
+    --gradient-brand: linear-gradient(var(--angle), var(--color-primary), var(--color-secondary));
+    --focus-ring: var(--color-primary);
+  }
+  [data-density="compact"] {
+    --row-h: 40px; --control-h: 36px; --cell-pad: var(--space-2) var(--space-3);
+  }
+}

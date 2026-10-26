@@ -1,0 +1,14 @@
+/* Purpose: high-contrast theme extras (colors come from config.theme.hc); thicker borders and outlines. */
+@layer themes {
+  [data-theme="hc"] {
+    color-scheme: dark;
+    --shadow-1: 0 0 0 2px var(--border); --shadow-2: 0 0 0 2px var(--border); --shadow-3: 0 0 0 2px var(--border);
+    --shadow-4: 0 0 0 2px var(--border); --shadow-5: 0 0 0 2px var(--border);
+    --glass-bg: var(--surface); --overlay: rgb(0 0 0 / .85);
+    --skeleton: var(--surface-2); --skeleton-shine: rgb(255 255 255 / .15);
+    --focus-ring: var(--color-accent);
+  }
+  [data-theme="hc"] :focus-visible { outline-width: 4px; }
+  [data-theme="hc"] a { text-decoration: underline; }
+  [data-theme="hc"] .card, [data-theme="hc"] .btn, [data-theme="hc"] .input { border-width: 2px; }
+}

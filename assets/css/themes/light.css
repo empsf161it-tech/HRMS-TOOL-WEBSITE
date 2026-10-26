@@ -1,0 +1,32 @@
+/* Purpose: light theme defaults (pre-JS fallback) and elevation shadows. Runtime values come from the site config. */
+@layer themes {
+
+  :root,
+  [data-theme="light"] {
+    color-scheme: light;
+    --color-primary: #5414b8;
+    --color-secondary: #00a3e0;
+    --color-accent: #ffc500;
+    --color-success: #00b824;
+    --color-warning: #ffb000;
+    --color-danger: #e51821;
+    --color-info: #00a3e0;
+    --on-primary: #ffffff;
+    --bg: #f6f8fc;
+    --surface: #ffffff;
+    --surface-2: #eef2f8;
+    --border: #dce4f0;
+    --text: #051538;
+    --text-muted: #5a6b8a;
+    --shadow-color: 226 62% 12%;
+    --shadow-1: 0 1px 2px hsl(var(--shadow-color) / .06);
+    --shadow-2: 0 2px 8px -2px hsl(var(--shadow-color) / .08), 0 1px 2px hsl(var(--shadow-color) / .05);
+    --shadow-3: 0 8px 24px -6px hsl(var(--shadow-color) / .12), 0 2px 6px hsl(var(--shadow-color) / .06);
+    --shadow-4: 0 16px 40px -10px hsl(var(--shadow-color) / .18), 0 4px 10px hsl(var(--shadow-color) / .06);
+    --shadow-5: 0 28px 64px -16px hsl(var(--shadow-color) / .3), 0 8px 16px hsl(var(--shadow-color) / .08);
+    --glass-bg: color-mix(in srgb, var(--surface) 72%, transparent);
+    --overlay: hsl(222 47% 11% / .45);
+    --skeleton: var(--surface-2);
+    --skeleton-shine: color-mix(in srgb, var(--surface) 80%, transparent);
+  }
+}

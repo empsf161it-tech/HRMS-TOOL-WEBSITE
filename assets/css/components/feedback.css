@@ -1,0 +1,49 @@
+/* Purpose: alerts, banners, skeletons, empty/error states, toasts, stepper, illustrations (layer: components). */
+@layer components {
+  .alert { --_c: var(--color-info); display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid color-mix(in oklab, var(--_c) 35%, transparent); background: color-mix(in oklab, var(--_c) 10%, var(--surface)); }
+  .alert > eh-icon { color: var(--_c); margin-block-start: 2px; }
+  .alert--success { --_c: var(--color-success); } .alert--warning { --_c: var(--color-warning); } .alert--danger { --_c: var(--color-danger); }
+  .alert__title { font-weight: 600; } .alert__body { font-size: var(--text-sm); color: var(--text-muted); }
+  .alert__actions { margin-inline-start: auto; display: flex; gap: var(--space-2); }
+  .banner { display: flex; align-items: center; justify-content: center; gap: var(--space-3); padding: var(--space-2) var(--space-4); background: var(--gradient-brand); color: var(--on-primary); font-size: var(--text-sm); font-weight: 500; }
+
+  .skeleton { position: relative; overflow: hidden; background: var(--skeleton); border-radius: var(--radius-sm); min-block-size: 1em; }
+  .skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent); transform: translateX(-100%); animation: shimmer 1.4s infinite; }
+  .skeleton--circle { border-radius: 50%; } .skeleton--text { block-size: .9em; margin-block: .35em; }
+  .skeleton-stack { display: grid; gap: var(--space-3); }
+  eh-skeleton { display: block; }
+
+  .state { display: grid; justify-items: center; text-align: center; gap: var(--space-3); padding: var(--space-12) var(--space-6); max-inline-size: 460px; margin-inline: auto; }
+  .state__art { inline-size: 160px; block-size: 128px; color: var(--color-primary); }
+  .state__title { font-size: var(--text-xl); } .state__text { color: var(--text-muted); }
+  .state--error .state__art { color: var(--color-danger); }
+  .ill { overflow: visible; } .ill .ill-fill { fill: color-mix(in oklab, currentColor 12%, var(--surface)); stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .ill .ill-line { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .ill .ill-dot { fill: currentColor; } .ill .ill-float { animation: float 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .ill .ill-float-2 { animation: float 5s ease-in-out infinite reverse; transform-box: fill-box; transform-origin: center; }
+  .ill .ill-check { stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw 1s var(--ease-out) .2s forwards; }
+
+  /* toasts */
+  .toast-region { position: fixed; z-index: var(--z-toast); inset-block-start: var(--space-4); inset-inline-end: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); inline-size: min(380px, calc(100vw - 2 * var(--space-4))); pointer-events: none; }
+  @media (max-width: 767px) { .toast-region { inset-block-start: auto; inset-block-end: calc(var(--bottom-nav-h) + var(--space-3)); inset-inline: var(--space-4); inline-size: auto; flex-direction: column-reverse; } }
+  .toast { --_c: var(--color-info); pointer-events: auto; display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-3) var(--space-4); background: var(--surface); border: 1px solid var(--border); border-inline-start: 4px solid var(--_c); border-radius: var(--radius-md); box-shadow: var(--shadow-4); touch-action: pan-y; animation: toast-in var(--dur-slow) var(--ease-spring) both; }
+  .toast > eh-icon { color: var(--_c); margin-block-start: 2px; }
+  .toast--success { --_c: var(--color-success); } .toast--warning { --_c: var(--color-warning); } .toast--danger { --_c: var(--color-danger); }
+  .toast__title { font-weight: 600; font-size: var(--text-sm); } .toast__msg { font-size: var(--text-sm); color: var(--text-muted); }
+  .toast.is-leaving { animation: toast-out var(--dur-base) var(--ease-out) forwards; }
+  @keyframes toast-in { from { opacity: 0; transform: translateX(32px) scale(.96); } to { opacity: 1; transform: none; } }
+  @keyframes toast-out { to { opacity: 0; transform: translateX(var(--swipe, 40px)) scale(.96); } }
+  @media (max-width: 767px) { @keyframes toast-in { from { opacity: 0; transform: translateY(24px) scale(.96); } to { opacity: 1; transform: none; } } }
+
+  /* stepper */
+  .stepper { display: flex; align-items: flex-start; gap: 0; list-style: none; padding: 0; margin: 0; counter-reset: step; }
+  .stepper__step { flex: 1 1 0; display: grid; justify-items: center; gap: var(--space-2); position: relative; text-align: center; font-size: var(--text-xs); color: var(--text-muted); }
+  .stepper__step::before { content: ""; position: absolute; inset-block-start: 15px; inset-inline-end: 50%; inline-size: 100%; block-size: 2px; background: var(--border); z-index: 0; }
+  .stepper__step:first-child::before { display: none; }
+  .stepper__dot { position: relative; z-index: 1; display: grid; place-items: center; inline-size: 32px; block-size: 32px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border); font-weight: 700; font-size: var(--text-xs); transition: all var(--dur-base) var(--ease-out); }
+  .stepper__step[aria-current="step"] { color: var(--text); font-weight: 600; }
+  .stepper__step[aria-current="step"] .stepper__dot { border-color: var(--color-primary); color: var(--color-primary); box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 18%, transparent); }
+  .stepper__step[data-state="done"] .stepper__dot { background: var(--color-primary); border-color: var(--color-primary); color: var(--on-primary); }
+  .stepper__step[data-state="done"]::before, .stepper__step[aria-current="step"]::before { background: var(--color-primary); }
+  @media (max-width: 599px) { .stepper__label { display: none; } .stepper__step[aria-current="step"] .stepper__label { display: block; position: absolute; inset-block-start: 38px; white-space: nowrap; } .stepper { padding-block-end: var(--space-6); } }
+}

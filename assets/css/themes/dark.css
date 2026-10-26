@@ -1,0 +1,20 @@
+/* Purpose: dark theme defaults. Elevation becomes subtle borders plus a faint glow instead of drop shadows. */
+@layer themes {
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --color-primary: #8b5cf6; --color-secondary: #38bdf8; --color-accent: #ffc500;
+    --color-success: #2ae252; --color-warning: #fbbf24; --color-danger: #ff4d57; --color-info: #38bdf8;
+    --on-primary: #050b1a;
+    --bg: #050b1a; --surface: #0b1736; --surface-2: #122452; --border: #1e3668; --text: #f1f5f9; --text-muted: #94a3b8;
+    --glow: color-mix(in oklab, var(--color-primary) 22%, transparent);
+    --shadow-1: 0 0 0 1px var(--border);
+    --shadow-2: 0 0 0 1px var(--border), 0 4px 16px -8px var(--glow);
+    --shadow-3: 0 0 0 1px var(--border), 0 8px 28px -10px var(--glow);
+    --shadow-4: 0 0 0 1px var(--border), 0 16px 40px -12px var(--glow);
+    --shadow-5: 0 0 0 1px var(--border), 0 24px 64px -16px var(--glow);
+    --glass-bg: color-mix(in srgb, var(--surface) 70%, transparent);
+    --overlay: hsl(222 50% 4% / .65);
+    --skeleton: var(--surface-2);
+    --skeleton-shine: color-mix(in srgb, var(--text) 8%, transparent);
+  }
+}
