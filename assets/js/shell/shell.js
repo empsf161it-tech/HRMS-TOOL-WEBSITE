@@ -41,12 +41,13 @@ export function mountShell(root = document.body) {
     document.body.style.overflow = '';
   }
 
-  // Auto-collapse on tablet (768 - 1023px)
+  // Auto-collapse on tablet (768 - 1023px), expand on desktop (>= 1024px)
   const tabletMq = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
   function checkTablet(mq) {
     if (mq.matches) {
-      // Always collapse sidebar on tablet regardless of stored pref
       setCollapsed(true);
+    } else if (window.innerWidth >= 1024) {
+      setCollapsed(false);
     }
   }
   tabletMq.addEventListener('change', checkTablet);

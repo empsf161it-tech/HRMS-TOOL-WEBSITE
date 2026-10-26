@@ -291,11 +291,11 @@ export function createSidebar({ onClose, onToggleCollapse }) {
       'data-tooltip': collapsed ? item.label : null
     },
       icon(item.icon, { size: 18 }),
-      h('span', { class: 'nav-item__label' }, item.label),
-      item.isNew && !isParentActive ? h('span', { class: 'nav-badge-new' }, 'New') : null,
-      (hasSub && isParentActive && !collapsed)
+      collapsed ? null : h('span', { class: 'nav-item__label' }, item.label),
+      (!collapsed && item.isNew && !isParentActive) ? h('span', { class: 'nav-badge-new' }, 'New') : null,
+      (!collapsed && hasSub && isParentActive)
         ? icon('chevron-down', { size: 14, cls: 'nav-item__arrow' })
-        : (item.hasChevron && !collapsed ? icon('chevron-right', { size: 14, cls: 'nav-item__arrow' }) : null)
+        : (!collapsed && (item.hasChevron || hasSub) ? icon('chevron-right', { size: 14, cls: 'nav-item__arrow' }) : null)
     );
 
     let subMenuEl = null;

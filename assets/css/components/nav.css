@@ -366,21 +366,20 @@
   }
 
   /* Collapsed state adjustments */
-  .app[data-collapsed] .sidebar :is(.brand__text, .sidebar__search, .nav-item__label, .nav-item__arrow, .nav-badge-new, .sidebar__section-title, .sidebar__ai-card, .sidebar__collapse-btn span) {
-    display: none;
+  .app[data-collapsed] .sidebar :is(.brand__text, .sidebar__search, .nav-item__label, .nav-item__arrow, .nav-badge-new, .sidebar__section-title, .sidebar__ai-card, .sidebar__collapse-btn span, .nav-submenu) {
+    display: none !important;
   }
   .app[data-collapsed] .sidebar__brand,
   .app[data-collapsed] .nav-item,
   .app[data-collapsed] .sidebar__foot {
-    justify-content: center;
+    justify-content: center !important;
+    padding-inline: 0 !important;
+  }
+  .app[data-collapsed] .nav-item {
+    gap: 0 !important;
   }
   .app[data-collapsed] .nav-indicator {
     inset-inline: var(--space-2);
-  }
-  @media (max-width: 767px) {
-    .app[data-collapsed] .sidebar :is(.brand__text, .sidebar__search, .nav-item__label, .nav-item__arrow, .nav-badge-new, .sidebar__section-title, .sidebar__ai-card, .sidebar__collapse-btn span) {
-      display: revert;
-    }
   }
 
   /* ---------- topbar (Stripe/Vercel glassmorphism) ---------- */
