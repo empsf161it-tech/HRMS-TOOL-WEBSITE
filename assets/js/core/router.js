@@ -38,7 +38,7 @@ async function resolve({ segs, query, path }) {
   if (!mod.public && !appStore.user) return { redirect: `/login?next=${encodeURIComponent(path)}` };
   if (mod.public && appStore.user && segs[0] === 'login' && !query.switch) return { redirect: '/home' };
   if (!mod.public && !mod.always && !canModule(mod.id)) return { view: (await errors()).forbidden, route: { title: '403' }, params: {}, mod };
-  if (!mod.routes) return { view: (await import('../modules/shared/scheduled.js')).default, route: { title: mod.label }, params: { sub: segs.slice(1).join('/') }, mod };
+  if (!mod.routes) return { view: (await import('../modules/shared/scheduled.js')).default, route: { title: mod.label }, params: { sub: segs.slice(1).join('/') || query.sub || '', ...query }, mod };
   const { routes } = await mod.routes();
   const m = matchRoute(routes, segs.slice(1));
   if (!m) return { view: (await errors()).notFound, route: { title: '404' }, params: {}, mod };

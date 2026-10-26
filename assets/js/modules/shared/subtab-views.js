@@ -1034,6 +1034,402 @@ export function buildAttendanceSubtab(tabName, employees, switchSubtab) {
 }
 
 /**
+ * 2.8 FACE RECOGNITION HARDWARE INTEGRATION SUBTAB VIEWS
+ */
+export function buildDevicesSubtab(tabName, employees, switchSubtab) {
+  const container = h('div', { class: 'subtab-view' });
+
+  // Tab 1 & 2: Device Management & Face Recognition Terminals
+  if (tabName.includes('Terminal') || tabName.includes('Management') || tabName === 'Device Management') {
+    const terminals = [
+      { id: 'DEV-01', model: 'Hikvision DS-K1T671MF Face Terminal', ip: '192.168.1.120:8000', mac: 'BC:5E:CD:94:1A:01', loc: 'Chennai HQ · Gate 1 Main Entrance', faces: 428, prints: 428, rfid: 428, fw: 'v3.2.4 Build 2608', ping: '18ms', status: 'Online', tag: 'green' },
+      { id: 'DEV-02', model: 'ZKTeco ProFace X [TI] Thermal & Face', ip: '192.168.1.121:4370', mac: 'BC:5E:CD:94:1A:02', loc: 'Chennai HQ · Floor 2 Tech Wing', faces: 428, prints: 0, rfid: 428, fw: 'v2.1.0 Build 2604', ping: '22ms', status: 'Online', tag: 'green' },
+      { id: 'DEV-03', model: 'Suprema FaceStation F2 Dual RFID & Face', ip: '192.168.2.105:8000', mac: 'BC:5E:CD:94:1A:03', loc: 'Bangalore Tech Park · Reception Gate', faces: 186, prints: 186, rfid: 186, fw: 'v1.4.2 Build 2590', ping: '34ms', status: 'Online', tag: 'green' },
+      { id: 'DEV-04', model: 'ZKTeco SilkBio-101TC Fingerprint & Face', ip: '192.168.3.110:4370', mac: 'BC:5E:CD:94:1A:04', loc: 'Coimbatore Branch · Main Entrance', faces: 78, prints: 78, rfid: 78, fw: 'v2.0.8 Build 2580', ping: '42ms', status: 'Online', tag: 'green' },
+      { id: 'DEV-05', model: 'Realtime T52 AI Dynamic Face Camera', ip: '192.168.4.115:8000', mac: 'BC:5E:CD:94:1A:05', loc: 'Kochi Harbour Logistics Hub · Gate A', faces: 54, prints: 54, rfid: 54, fw: 'v1.1.2 Build 2600', ping: '48ms', status: 'Online', tag: 'green' },
+      { id: 'DEV-06', model: 'Dahua ASI7213X-T1 Secure Access Face Terminal', ip: '192.168.1.125:8000', mac: 'BC:5E:CD:94:1A:06', loc: 'Chennai HQ · Server Room Data Center', faces: 18, prints: 18, rfid: 18, fw: 'v3.0.1 Build 2610', ping: '15ms', status: 'Online', tag: 'green' },
+    ];
+
+    const middleGrid = h('div', { class: 'dash-middle-grid' });
+
+    const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Face Recognition Terminals & Biometric Hardware'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, '14 biometric terminals actively synchronizing face vectors and attendance punches.')
+        ),
+        h('div', { class: 'cluster gap-2' },
+          h('button', {
+            class: 'btn btn--secondary btn--sm',
+            type: 'button',
+            onClick: () => toastSuccess('Ping sweep sent to 14 hardware terminals. Average latency: 28ms.')
+          }, icon('refresh-cw', { size: 14 }), 'Ping All Terminals'),
+          h('button', {
+            class: 'btn btn--primary btn--sm',
+            type: 'button',
+            style: 'background: #1E60FF;',
+            onClick: () => toastSuccess('Device Registration Wizard opened. Discovering LAN terminals…')
+          }, icon('plus', { size: 14 }), 'Register Hardware Device')
+        )
+      ),
+      h('div', { class: 'subtab-grid' },
+        ...terminals.map((dev) => h('div', { class: 'interactive-card' },
+          h('div', { class: 'interactive-card__head' },
+            h('div', null,
+              h('h4', { class: 'interactive-card__title', style: 'font-size: 13.5px;' }, dev.model),
+              h('div', { class: 'interactive-card__sub' }, dev.loc)
+            ),
+            h('span', { class: 'interactive-card__tag tag--green' }, '🟢 Online')
+          ),
+          h('div', { style: 'background: var(--surface-2); padding: 8px 12px; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11.5px;' },
+            h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'IP Address: '), h('strong', null, dev.ip)),
+            h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'Ping: '), h('strong', { style: 'color: #10B981;' }, dev.ping)),
+            h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'Enrolled Faces: '), h('strong', { style: 'color: #1E60FF;' }, `${dev.faces} Faces`)),
+            h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'Firmware: '), h('strong', null, dev.fw))
+          ),
+          h('div', { class: 'split gap-2', style: 'border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px;' },
+            h('button', {
+              class: 'btn btn--ghost btn--sm',
+              type: 'button',
+              style: 'font-size: 11.5px;',
+              onClick: () => toastSuccess(`Synchronized face database with ${dev.id}!`)
+            }, icon('upload-cloud', { size: 13 }), 'Push Templates'),
+            h('button', {
+              class: 'btn btn--secondary btn--sm',
+              type: 'button',
+              style: 'font-size: 11.5px;',
+              onClick: () => toastSuccess(`Terminal console opened for ${dev.id}`)
+            }, icon('settings', { size: 13 }), 'Configure Device')
+          )
+        ))
+      )
+    );
+
+    const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Terminal Fleet Overview'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px; font-size: 12px;' },
+          h('div', { class: 'split' }, h('span', null, 'Total Hardware Devices'), h('span', { style: 'font-weight: 700; color: #1E60FF;' }, '14 Terminals')),
+          h('div', { class: 'split' }, h('span', null, 'Connected & Online'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '14 / 14 (100%)')),
+          h('div', { class: 'split' }, h('span', null, 'Average Response Ping'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '28ms')),
+          h('div', { class: 'split' }, h('span', null, 'Firmware Status'), h('span', { style: 'font-weight: 700; color: #10B981;' }, 'Up to Date ✓'))
+        )
+      ),
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Hardware Quick Actions'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px;' },
+          h('button', { class: 'quick-action-btn', type: 'button', onClick: () => toastSuccess('LAN Broadcast sent. Discovered 0 new devices.') },
+            h('span', { class: 'cluster gap-2', style: 'align-items: center;' }, icon('wifi', { size: 14, style: 'color: #1E60FF;' }), h('span', null, 'Auto-Discover Devices')),
+            icon('chevron-right', { size: 13, style: 'color: var(--text-muted);' })
+          ),
+          h('button', { class: 'quick-action-btn', type: 'button', onClick: () => toastSuccess('NTP Time sync broadcast sent to all 14 terminals.') },
+            h('span', { class: 'cluster gap-2', style: 'align-items: center;' }, icon('clock', { size: 14, style: 'color: #10B981;' }), h('span', null, 'Sync Terminal NTP Clocks')),
+            icon('chevron-right', { size: 13, style: 'color: var(--text-muted);' })
+          ),
+          h('button', { class: 'quick-action-btn', type: 'button', onClick: () => toastSuccess('428 Face recognition templates pushed to all branches.') },
+            h('span', { class: 'cluster gap-2', style: 'align-items: center;' }, icon('users', { size: 14, style: 'color: #7C3AED;' }), h('span', null, 'Re-sync Face Templates')),
+            icon('chevron-right', { size: 13, style: 'color: var(--text-muted);' })
+          )
+        )
+      )
+    );
+
+    middleGrid.append(leftCol, rightCol);
+    container.append(middleGrid);
+    return container;
+  }
+
+  // Tab 3 & 4: Biometric, RFID & Smart Attendance Device Integration
+  if (tabName.includes('Biometric') || tabName.includes('RFID') || tabName.includes('Smart')) {
+    const protocols = [
+      { name: 'AI Face Recognition (3D Vector)', standard: 'Dual Sensor Liveness Anti-Spoofing', range: '0.3m - 2.5m Recognition Distance', speed: '< 0.2s Match Speed', score: '99.6% Accuracy', icon: 'scan-face', color: '#1E60FF' },
+      { name: 'Optical Biometric Fingerprint', standard: 'SilkID Live-Tissue Sensor · 500 DPI', range: 'Direct Touch 360°', speed: '< 0.5s 1:N Matching', score: '99.2% Accuracy', icon: 'fingerprint', color: '#10B981' },
+      { name: 'Smart RFID & NFC Card Contactless', standard: 'Mifare 13.56MHz & EM 125kHz Protocols', range: '2cm - 5cm Tap Distance', speed: '< 0.1s Instant Swipe', score: '100% Reliable', icon: 'credit-card', color: '#7C3AED' },
+      { name: 'GPS Geofenced Mobile Punch', standard: 'WGS-84 Coordinate Geofencing with Mock-GPS Guard', range: '120m Radius of Office Geofence', speed: 'Real-Time Sync', score: 'Location Verified', icon: 'map-pin', color: '#F59E0B' },
+    ];
+
+    const cards = h('div', { class: 'subtab-grid' });
+    protocols.forEach((p) => {
+      cards.append(h('div', { class: 'interactive-card' },
+        h('div', { class: 'interactive-card__head' },
+          h('div', { class: 'cluster gap-2', style: 'align-items: center;' },
+            h('div', { style: `width: 38px; height: 38px; border-radius: 10px; background: rgba(30,96,255,0.1); color: ${p.color}; display: grid; place-items: center;` }, icon(p.icon, { size: 20 })),
+            h('div', null,
+              h('h4', { class: 'interactive-card__title' }, p.name),
+              h('div', { class: 'interactive-card__sub' }, p.standard)
+            )
+          ),
+          h('span', { class: 'interactive-card__tag tag--green' }, 'Integrated')
+        ),
+        h('div', { style: 'background: var(--surface-2); padding: 10px 12px; border-radius: 8px; font-size: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;' },
+          h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'Detection Range: '), h('strong', null, p.range)),
+          h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'Speed: '), h('strong', { style: 'color: #10B981;' }, p.speed)),
+          h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'Verification Score: '), h('strong', { style: 'color: #1E60FF;' }, p.score)),
+          h('div', null, h('span', { style: 'color: var(--text-muted);' }, 'Status: '), h('strong', { style: 'color: #10B981;' }, 'Active & Enforcing'))
+        ),
+        h('div', { class: 'split gap-2', style: 'border-top: 1px solid var(--border); padding-top: 10px; margin-top: 8px;' },
+          h('button', { class: 'btn btn--ghost btn--sm', type: 'button', onClick: () => toastSuccess(`Diagnostic test run for ${p.name}: 100% Passed.`) }, 'Run Self-Test'),
+          h('button', { class: 'btn btn--secondary btn--sm', type: 'button', onClick: () => toastSuccess(`Hardware parameters opened for ${p.name}`) }, 'Sensor Settings')
+        )
+      ));
+    });
+
+    container.append(
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Biometric, RFID & Smart Hardware Device Protocols'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, 'Multi-modal hardware authentication engines active on the premises.')
+        ),
+        h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Multi-modal hardware configuration wizard ready.') }, icon('sliders', { size: 14 }), 'Configure Hardware Protocols')
+      ),
+      cards
+    );
+    return container;
+  }
+
+  // Tab 6: Employee Face Registration
+  if (tabName.includes('Face') && (tabName.includes('Registration') || tabName.includes('Reg'))) {
+    const faceEnrolled = [
+      { name: 'Vignesh Palanisamy', code: 'ELR-0001', dept: 'Operations', score: '99.6% Match', status: 'Enrolled & Verified', vector: '128-d Euclidean Vector', date: 'Enrolled Oct 2026', pill: 'ready' },
+      { name: 'Kiran Verma', code: 'ELR-0002', dept: 'Operations', score: '98.9% Match', status: 'Enrolled & Verified', vector: '128-d Euclidean Vector', date: 'Enrolled Oct 2026', pill: 'ready' },
+      { name: 'Sneha Krishnan', code: 'ELR-0003', dept: 'Operations', score: '99.4% Match', status: 'Enrolled & Verified', vector: '128-d Euclidean Vector', date: 'Enrolled Oct 2026', pill: 'ready' },
+      { name: 'Suresh Kulkarni', code: 'ELR-0004', dept: 'Operations', score: '99.1% Match', status: 'Enrolled & Verified', vector: '128-d Euclidean Vector', date: 'Enrolled Oct 2026', pill: 'ready' },
+      { name: 'Deepa Patel', code: 'ELR-0005', dept: 'Operations', score: '99.3% Match', status: 'Enrolled & Verified', vector: '128-d Euclidean Vector', date: 'Enrolled Oct 2026', pill: 'ready' },
+      { name: 'Nitin Varma', code: 'ELR-0006', dept: 'Operations', score: 'Pending Photo', status: 'Pending Enrollment', vector: 'Not Enrolled', date: 'Invitation Sent', pill: 'hold' },
+    ];
+
+    const middleGrid = h('div', { class: 'dash-middle-grid' });
+
+    const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Employee Face Registration & Biometric Enrollment'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, 'Capture high-accuracy 3D facial vectors for contactless hardware authentication.')
+        ),
+        h('div', { class: 'cluster gap-2' },
+          h('button', { class: 'btn btn--secondary btn--sm', type: 'button', onClick: () => toastSuccess('Bulk face registration upload link sent to 12 new joinees.') }, icon('send', { size: 14 }), 'Send Self-Enrollment Link'),
+          h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('WebCam face scanner activated! Position face in center of frame.') }, icon('camera', { size: 14 }), 'Live Camera Enrollment')
+        )
+      ),
+      h('div', { class: 'dash-table-wrap' },
+        h('table', { class: 'dash-table' },
+          h('thead', null,
+            h('tr', null,
+              h('th', null, 'Employee / Personnel'),
+              h('th', null, 'Department'),
+              h('th', null, 'Face Match Score'),
+              h('th', null, 'Biometric Template'),
+              h('th', null, 'Enrollment Date'),
+              h('th', null, 'Status'),
+              h('th', { style: 'text-align: right;' }, 'Action')
+            )
+          ),
+          h('tbody', null,
+            ...faceEnrolled.map((emp) => h('tr', null,
+              h('td', null,
+                h('div', { class: 'table-emp-cell' },
+                  h('div', { class: 'table-emp-avatar-fallback' }, emp.name[0]),
+                  h('div', { class: 'table-emp-meta' },
+                    h('span', { class: 'table-emp-name' }, emp.name),
+                    h('span', { class: 'table-emp-id' }, emp.code)
+                  )
+                )
+              ),
+              h('td', null, emp.dept),
+              h('td', { style: 'font-weight: 700; color: emp.pill === \'ready\' ? \'#10B981\' : \'#F59E0B\';' }, emp.score),
+              h('td', { style: 'font-size: 11.5px; color: var(--text-muted);' }, emp.vector),
+              h('td', { style: 'font-size: 12px;' }, emp.date),
+              h('td', null, h('span', { class: `dash-status-pill dash-status-pill--${emp.pill}` }, emp.status)),
+              h('td', { style: 'text-align: right;' },
+                h('button', {
+                  class: 'btn btn--ghost btn--sm',
+                  type: 'button',
+                  onClick: () => toastSuccess(`Camera re-scan opened for ${emp.name}`)
+                }, 'Re-Scan')
+              )
+            ))
+          )
+        )
+      )
+    );
+
+    const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Face Enrollment Standards'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.45;' },
+          h('div', null, '• Minimum 98.0% face similarity match score required for secure door unlock.'),
+          h('div', null, '• IR liveness detection prevents spoofing via mobile photos or printed masks.'),
+          h('div', null, '• 128-dimensional mathematical vector stored; raw photo is securely encrypted.')
+        )
+      ),
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Enrollment Metrics'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px; font-size: 12px;' },
+          h('div', { class: 'split' }, h('span', null, 'Total Workforce'), h('span', { style: 'font-weight: 700;' }, '428 Employees')),
+          h('div', { class: 'split' }, h('span', null, 'Enrolled & Active'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '424 (99.1%)')),
+          h('div', { class: 'split' }, h('span', null, 'Pending Photos'), h('span', { style: 'font-weight: 700; color: #F59E0B;' }, '4 Joinees'))
+        )
+      )
+    );
+
+    middleGrid.append(leftCol, rightCol);
+    container.append(middleGrid);
+    return container;
+  }
+
+  // Tab 7: Device-wise Employee Mapping
+  if (tabName.includes('Mapping')) {
+    const mappings = [
+      { name: 'Engineering & Development', count: 184, gates: 'Chennai HQ Gates 1 & 2 · Floor 2 Tech Wing', access: '24/7 Access (Shift Unlocked)', status: 'Synced (14/14 Devices)' },
+      { name: 'Operations & Facilities', count: 112, gates: 'All Branches · Gate 1 & 2 · Service Entrances', access: '06:00 - 23:00 IST', status: 'Synced (14/14 Devices)' },
+      { name: 'Client Deployed Personnel', count: 78, gates: 'Bangalore Tech Park · Coimbatore Gate', access: 'Client Shift Roster (09:00 - 18:00)', status: 'Synced (8/8 Devices)' },
+      { name: 'Executive Leadership & IT Ops', count: 36, gates: 'All Gates + Server Room Secure Data Center', access: '24/7 Biometric Full Access', status: 'Synced (14/14 Devices)' },
+    ];
+
+    const cards = h('div', { class: 'subtab-grid' });
+    mappings.forEach((m) => {
+      cards.append(h('div', { class: 'interactive-card' },
+        h('div', { class: 'interactive-card__head' },
+          h('h4', { class: 'interactive-card__title' }, m.name),
+          h('span', { class: 'skill-chip', style: 'color: #1E60FF; font-weight: 700;' }, `${m.count} Staff`)
+        ),
+        h('div', { style: 'font-size: 12px; color: var(--text-muted); line-height: 1.45;' },
+          h('div', null, h('strong', { style: 'color: var(--text);' }, 'Authorized Gates: '), m.gates),
+          h('div', { style: 'margin-top: 4px;' }, h('strong', { style: 'color: var(--text);' }, 'Allowed Schedule: '), m.access)
+        ),
+        h('div', { class: 'split gap-2', style: 'border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;' },
+          h('span', { style: 'font-size: 11px; font-weight: 700; color: #10B981;' }, `✓ ${m.status}`),
+          h('button', { class: 'btn btn--ghost btn--sm', type: 'button', onClick: () => toastSuccess(`Editing ACL permissions for ${m.name}`) }, 'Edit Access')
+        )
+      ));
+    });
+
+    container.append(
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Device-wise Employee Access Mapping'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, 'Role-based door access control and hardware permission mapping.')
+        ),
+        h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Access mapping rules pushed to all 14 terminals!') }, icon('check-check', { size: 14 }), 'Push Mapping to Terminals')
+      ),
+      cards
+    );
+    return container;
+  }
+
+  // Tab 8: Real-Time Punch Sync & Live WebSocket Stream
+  if (tabName.includes('Sync') || tabName.includes('Real-Time')) {
+    const livePunches = [
+      { time: '16:05:42', dev: 'DEV-01 (Chennai Gate 1)', name: 'Vignesh Palanisamy', method: 'Face Match 99.6%', relay: 'Door Relayed (2s)', status: 'Success · DB Logged', color: '#10B981' },
+      { time: '16:03:19', dev: 'DEV-02 (Floor 2 Tech Wing)', name: 'Kiran Verma', method: 'SilkID Fingerprint', relay: 'Door Relayed (2s)', status: 'Success · DB Logged', color: '#10B981' },
+      { time: '16:00:08', dev: 'DEV-03 (Bangalore Gate A)', name: 'Sneha Krishnan', method: 'Face Match 99.4%', relay: 'Door Relayed (2s)', status: 'Success · DB Logged', color: '#10B981' },
+      { time: '15:57:44', dev: 'DEV-01 (Chennai Gate 1)', name: 'Suresh Kulkarni', method: 'RFID Tap #90124', relay: 'Door Relayed (2s)', status: 'Success · DB Logged', color: '#10B981' },
+      { time: '15:54:12', dev: 'DEV-04 (Coimbatore Entrance)', name: 'Deepa Patel', method: 'Face Match 99.1%', relay: 'Door Relayed (2s)', status: 'Success · DB Logged', color: '#10B981' },
+      { time: '15:50:33', dev: 'DEV-06 (Server Room Door)', name: 'Nitin Varma', method: 'Dual Face + Card', relay: 'High Security Secure Unlock', status: 'Success · DB Logged', color: '#10B981' },
+    ];
+
+    const middleGrid = h('div', { class: 'dash-middle-grid' });
+
+    const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+      h('div', { class: 'split gap-3', style: 'align-items: center;' },
+        h('div', null,
+          h('h3', { style: 'font-size: 15px; font-weight: 700; margin: 0; color: var(--text);' }, 'Real-Time Hardware Punch Sync Stream'),
+          h('p', { style: 'font-size: 12px; color: var(--text-muted); margin: 2px 0 0;' }, 'Live bidirectional WebSocket event listener for hardware punches and door relays.')
+        ),
+        h('div', { class: 'cluster gap-2' },
+          h('span', { class: 'cluster gap-1', style: 'font-size: 11px; font-weight: 700; color: #10B981; background: rgba(16,185,129,0.12); padding: 4px 10px; border-radius: 99px;' },
+            h('span', { style: 'width: 7px; height: 7px; border-radius: 50%; background: #10B981; display: inline-block;' }),
+            'WebSocket Connected (Port 8443)'
+          ),
+          h('button', { class: 'btn btn--primary btn--sm', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Simulated hardware face punch received!') }, icon('play', { size: 14 }), 'Simulate Punch')
+        )
+      ),
+      h('div', { class: 'dash-table-wrap' },
+        h('table', { class: 'dash-table' },
+          h('thead', null,
+            h('tr', null,
+              h('th', null, 'Timestamp'),
+              h('th', null, 'Hardware Terminal'),
+              h('th', null, 'Employee / Personnel'),
+              h('th', null, 'Authentication Method'),
+              h('th', null, 'Relay Action'),
+              h('th', null, 'Ledger Sync')
+            )
+          ),
+          h('tbody', null,
+            ...livePunches.map((p) => h('tr', null,
+              h('td', { style: 'font-weight: 700; font-family: monospace; color: var(--text);' }, p.time),
+              h('td', { style: 'font-size: 12px; color: #1E60FF;' }, p.dev),
+              h('td', { style: 'font-weight: 600;' }, p.name),
+              h('td', null, h('span', { class: 'dash-status-pill dash-status-pill--ready' }, p.method)),
+              h('td', { style: 'font-size: 11.5px; color: var(--text-muted);' }, p.relay),
+              h('td', { style: 'font-size: 11.5px; font-weight: 700; color: #10B981;' }, p.status)
+            ))
+          )
+        )
+      )
+    );
+
+    const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+      h('div', { class: 'kpi-card' },
+        h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Sync Pipeline Performance'),
+        h('div', { style: 'display: flex; flex-direction: column; gap: 8px; font-size: 12px;' },
+          h('div', { class: 'split' }, h('span', null, 'WebSocket Ingestion Latency'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '42ms')),
+          h('div', { class: 'split' }, h('span', null, 'Offline Stored Buffer'), h('span', { style: 'font-weight: 700; color: #10B981;' }, '0 Records Pending')),
+          h('div', { class: 'split' }, h('span', null, 'Database Transaction Rate'), h('span', { style: 'font-weight: 700;' }, '120 punches/sec max')),
+          h('div', { class: 'split' }, h('span', null, 'Data Integrity Hash'), h('span', { style: 'font-weight: 700; color: #1E60FF;' }, 'SHA-256 Verified ✓'))
+        )
+      )
+    );
+
+    middleGrid.append(leftCol, rightCol);
+    container.append(middleGrid);
+    return container;
+  }
+
+  // Tab 9 & 10: Device Health Monitoring & API/Webhooks
+  const middleGrid = h('div', { class: 'dash-middle-grid' });
+  const leftCol = h('div', { class: 'fade-left', style: 'display: flex; flex-direction: column; gap: 14px; width: 100%;' },
+    h('div', { class: 'interactive-card', style: 'padding: 24px;' },
+      h('h3', { style: 'font-size: 16px; font-weight: 700; margin: 0 0 12px; color: var(--text);' }, 'Hardware API & Webhook Configuration'),
+      h('p', { style: 'color: var(--text-muted); font-size: 13px; margin: 0 0 16px;' },
+        'Connect any biometric, face recognition, or RFID terminal directly via HTTP Webhooks, ISAPI, or Standalone SDK.'
+      ),
+      h('div', { style: 'display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;' },
+        h('div', null,
+          h('label', { style: 'font-size: 12px; font-weight: 700; color: var(--text);' }, 'REST Webhook Ingestion URL'),
+          h('input', { class: 'input', readonly: true, value: 'https://api.ellowring.com/v1/devices/punch-events', style: 'margin-top: 4px; font-family: monospace; background: var(--surface-2);' })
+        ),
+        h('div', null,
+          h('label', { style: 'font-size: 12px; font-weight: 700; color: var(--text);' }, 'Device Secret Signature Key (HMAC-SHA256)'),
+          h('input', { class: 'input', readonly: true, value: 'dev_sec_994f8a12e84c90d7b22104fa', style: 'margin-top: 4px; font-family: monospace; background: var(--surface-2);' })
+        )
+      ),
+      h('div', { class: 'cluster gap-2' },
+        h('button', { class: 'btn btn--primary', type: 'button', style: 'background: #1E60FF;', onClick: () => toastSuccess('Webhook test payload dispatched! 200 OK received.') }, icon('send', { size: 14 }), 'Send Test Webhook Event'),
+        h('button', { class: 'btn btn--secondary', type: 'button', onClick: () => toastSuccess('Hardware SDK documentation and postman collection downloaded!') }, icon('download', { size: 14 }), 'Download Hardware SDK')
+      )
+    )
+  );
+
+  const rightCol = h('div', { class: 'fade-right', style: 'display: flex; flex-direction: column; gap: 16px; width: 100%;' },
+    h('div', { class: 'kpi-card' },
+      h('h4', { style: 'font-size: 14px; font-weight: 700; margin: 0 0 10px; color: var(--text);' }, 'Compatible Manufacturers'),
+      h('div', { style: 'display: flex; flex-direction: column; gap: 8px; font-size: 12px;' },
+        h('div', { class: 'split' }, h('span', null, 'Hikvision MinMoe Series'), h('span', { style: 'font-weight: 700; color: #10B981;' }, 'ISAPI / Protocol 2.0')),
+        h('div', { class: 'split' }, h('span', null, 'ZKTeco Standalone Terminals'), h('span', { style: 'font-weight: 700; color: #10B981;' }, 'Push SDK / ADMS')),
+        h('div', { class: 'split' }, h('span', null, 'Suprema FaceStation / BioStation'), h('span', { style: 'font-weight: 700; color: #10B981;' }, 'BioStar 2 API')),
+        h('div', { class: 'split' }, h('span', null, 'Dahua Fact Series'), h('span', { style: 'font-weight: 700; color: #10B981;' }, 'CGI / SDK'))
+      )
+    )
+  );
+
+  middleGrid.append(leftCol, rightCol);
+  container.append(middleGrid);
+  return container;
+}
+
+/**
  * 3. GENERIC / ALL OTHER MODULES SUBTAB VIEWS
  */
 export function buildGenericSubtab(tabName, mod, employees, switchSubtab) {

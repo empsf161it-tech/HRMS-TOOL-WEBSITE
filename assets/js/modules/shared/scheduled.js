@@ -4,7 +4,7 @@ import { router } from '../../core/router.js';
 import { api } from '../../services/api.js';
 import { toastSuccess, openModal } from '../../components/ui.js';
 import { observeReveals } from '../../core/motion-engine.js';
-import { buildRecruitmentSubtab, buildLeaveSubtab, buildAttendanceSubtab, buildGenericSubtab } from './subtab-views.js';
+import { buildRecruitmentSubtab, buildLeaveSubtab, buildAttendanceSubtab, buildGenericSubtab, buildDevicesSubtab } from './subtab-views.js';
 
 function animateCounter(el, targetStr, duration = 800) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -197,6 +197,43 @@ export default async function scheduledView(ctx) {
         { label: 'Launch 360 Peer Review', icon: 'users', action: '360 survey distributed to 14 peers.' },
         { label: 'Calibrate 9-Box Grid', icon: 'grid', action: 'Talent matrix calibration loaded.' },
         { label: 'Export Promotion Recommendations', icon: 'award', action: 'Merit list generated.' },
+      ]
+    },
+    devices: {
+      actionLabel: 'Register Hardware Device',
+      actionIcon: 'scan-face',
+      subtabs: [
+        'Face Recognition Terminals',
+        'Biometric Device Integration',
+        'RFID Device Integration',
+        'Smart Attendance Device',
+        'Device Management',
+        'Employee Face Registration',
+        'Device-wise Employee Mapping',
+        'Real-Time Punch Sync',
+        'Device Health Monitoring',
+        'Device API & Webhook Integration'
+      ],
+      kpis: [
+        { label: 'Active Terminals', val: '14/14', target: '14', trend: '100% Online', trendDir: 'up', sub: 'across 4 branches', icon: 'scan-face', glow: '#10B981', box: 'mint' },
+        { label: 'Enrolled Faces', val: '428', target: '428', trend: '↑ 14', trendDir: 'up', sub: 'active personnel', icon: 'users', glow: '#2563EB', box: 'blue' },
+        { label: 'Sync Latency', val: '28', target: '28', suffix: 'ms', trend: 'Ultra-low', trendDir: 'up', sub: 'LAN WebSocket', icon: 'activity', glow: '#0EA5E9', box: 'sky' },
+        { label: 'Face Match Score', val: '99.4%', target: '99.4%', trend: '↑ 0.2%', trendDir: 'up', sub: 'anti-spoof active', icon: 'shield-check', glow: '#7C3AED', box: 'purple' },
+        { label: 'Today Device Punches', val: '756', target: '756', trend: '↑ 42', trendDir: 'up', sub: 'synced to attendance', icon: 'clock', glow: '#10B981', box: 'mint' },
+        { label: 'Offline Storage Buffer', val: '0', target: '0', trend: 'Clean', trendDir: 'up', sub: 'zero pending buffer', icon: 'database', glow: '#F59E0B', box: 'teal' },
+      ],
+      donutTitle: 'Terminal Fleet Distribution',
+      donutStats: [
+        { label: 'Face Recognition Terminals', count: 6, color: '#2563EB' },
+        { label: 'Biometric Fingerprint Units', count: 3, color: '#10B981' },
+        { label: 'RFID / NFC Turnstiles', count: 3, color: '#7C3AED' },
+        { label: 'Smart Mobile Geofence Hubs', count: 2, color: '#0EA5E9' },
+      ],
+      quickActions: [
+        { label: 'Auto-Discover Hardware on LAN', icon: 'wifi', action: 'Scanning LAN subnet 192.168.1.0/24…' },
+        { label: 'Push Face Templates to All Terminals', icon: 'upload-cloud', action: 'Pushing 428 face templates…' },
+        { label: 'Broadcast NTP Clock Calibration', icon: 'clock', action: 'Synchronized hardware clocks.' },
+        { label: 'Generate Terminal Health & Audit Report', icon: 'download', action: 'Exporting hardware diagnostics…' },
       ]
     }
   };
@@ -797,6 +834,9 @@ export default async function scheduledView(ctx) {
   const subtabContainer = h('div', { class: 'subtab-view-container', style: 'width: 100%; min-height: 420px;' });
 
   function renderSubtabContent(tabName) {
+    if (mod.id === 'devices') {
+      return buildDevicesSubtab(tabName, employees, switchSubtab);
+    }
     if (mod.id === 'recruitment') {
       return buildRecruitmentSubtab(tabName, employees, switchSubtab);
     }

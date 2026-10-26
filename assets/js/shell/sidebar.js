@@ -241,6 +241,19 @@ export function createSidebar({ onClose, onToggleCollapse }) {
     { label: 'Replacements', href: '#/geo-attendance' },
   ];
 
+  const DEVICE_SUBITEMS = [
+    { label: 'Face Recognition Terminal', href: '#/devices?sub=terminals', match: (p) => p === '/devices' || p.includes('terminals') },
+    { label: 'Biometric Device Integration', href: '#/devices?sub=biometric' },
+    { label: 'RFID Device Integration', href: '#/devices?sub=rfid' },
+    { label: 'Smart Attendance Device', href: '#/devices?sub=smart' },
+    { label: 'Device Management', href: '#/devices?sub=management' },
+    { label: 'Employee Face Registration', href: '#/devices?sub=face-reg' },
+    { label: 'Device-wise Employee Mapping', href: '#/devices?sub=mapping' },
+    { label: 'Real-Time Punch Sync', href: '#/devices?sub=sync' },
+    { label: 'Device Health Monitoring', href: '#/devices?sub=health' },
+    { label: 'Device API & Webhook Integration', href: '#/devices?sub=api' },
+  ];
+
   // Core navigation items matching client reference design
   const CORE_ITEMS = [
     { id: 'home', label: 'Dashboard', icon: 'layout-dashboard', href: '#/home' },
@@ -257,6 +270,7 @@ export function createSidebar({ onClose, onToggleCollapse }) {
     { id: 'recruitment', label: 'Recruitment (ATS)', icon: 'user-search', href: '#/recruitment', isNew: true },
     { id: 'it', label: 'Clients & Projects', icon: 'briefcase', href: '#/it', isNew: true, subitems: CLIENTS_SUBITEMS },
     { id: 'geo-attendance', label: 'Staffing / Deployments', icon: 'users-round', href: '#/geo-attendance', isNew: true, subitems: STAFFING_SUBITEMS },
+    { id: 'devices', label: '05. Face Recognition Hardware Integration', icon: 'scan-face', href: '#/devices', isNew: true, subitems: DEVICE_SUBITEMS },
     { id: 'timesheets', label: 'Timesheet', icon: 'clock', href: '#/timesheets', isNew: true },
     { id: 'ess', label: 'Client Portal', icon: 'monitor', href: '#/ess', isNew: true },
     { id: 'compliance', label: 'Invoicing & Billing', icon: 'receipt', href: '#/compliance', isNew: true },
@@ -279,6 +293,7 @@ export function createSidebar({ onClose, onToggleCollapse }) {
     // Check if parent should be open
     const isParentActive = (
       activePath === `/${item.id}` ||
+      (item.id === 'devices' && activePath.startsWith('/devices')) ||
       (item.id === 'geo-attendance' && (activePath === '/geo-attendance' || activePath === '/staffing' || activePath.startsWith('/timesheets'))) ||
       (item.id === 'payroll' && activePath.startsWith('/payroll')) ||
       (item.id === 'it' && (activePath.startsWith('/it') || activePath.startsWith('/clients')))
@@ -302,9 +317,10 @@ export function createSidebar({ onClose, onToggleCollapse }) {
     if (hasSub && isParentActive && !collapsed) {
       const subRows = item.subitems.map((sub) => {
         let isSubActive = false;
+        const currentHash = location.hash || '';
         if (sub.match) {
-          isSubActive = sub.match(activePath);
-        } else if (sub.href === `#${activePath}`) {
+          isSubActive = sub.match(activePath) || sub.match(currentHash.slice(1));
+        } else if (sub.href === currentHash || sub.href === `#${activePath}`) {
           isSubActive = true;
         }
 
