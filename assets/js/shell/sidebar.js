@@ -313,8 +313,8 @@ export function createSidebar({ onClose, onToggleCollapse }) {
           href: sub.href,
           'aria-current': isSubActive ? 'page' : null,
         },
-          h('span', { class: 'nav-subitem__dot' }, '•'),
-          h('span', null, sub.label)
+          h('span', { class: 'nav-subitem__dot', 'aria-hidden': 'true' }),
+          h('span', { class: 'nav-subitem__label' }, sub.label)
         );
       });
 
@@ -415,7 +415,7 @@ export function createSidebar({ onClose, onToggleCollapse }) {
       return;
     }
     indicator.style.setProperty('--ind-y', `${row.offsetTop}px`);
-    indicator.style.setProperty('--ind-h', `${row.offsetHeight}px`);
+    indicator.style.setProperty('--ind-h', `${a.offsetHeight}px`);
     indicator.style.setProperty('--ind-o', '1');
   }
 
