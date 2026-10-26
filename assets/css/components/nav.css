@@ -14,7 +14,8 @@
     background: var(--sb-bg);
     color: var(--sb-fg);
     border-inline-end: 1px solid var(--sb-line);
-    overflow: hidden;
+    overflow: clip;
+    overflow-x: clip;
   }
 
   [data-sidebar-style="dark"] .sidebar {
@@ -93,12 +94,14 @@
     position: relative;
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: clip;
     overscroll-behavior: contain;
     padding: var(--space-2) var(--space-3) var(--space-4);
     display: grid;
     align-content: start;
     gap: 3px;
+    min-inline-size: 0;
+    box-sizing: border-box;
   }
   .sidebar__nav::-webkit-scrollbar {
     width: 4px;
@@ -137,13 +140,16 @@
     z-index: 1;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 9px 12px;
+    gap: 10px;
+    padding: 8px 10px;
     min-block-size: 38px;
+    min-inline-size: 0;
+    inline-size: 100%;
+    box-sizing: border-box;
     border-radius: 10px;
     color: var(--sb-muted);
     text-decoration: none;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 500;
     transition: background var(--dur-fast), color var(--dur-fast);
   }
@@ -198,11 +204,11 @@
   .nav-badge-new {
     background: #10B981;
     color: #FFFFFF;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
-    padding: 1px 7px;
+    padding: 1px 6px;
     border-radius: 9999px;
-    line-height: 1.4;
+    line-height: 1.35;
     margin-inline-start: auto;
     flex-shrink: 0;
   }

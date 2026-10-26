@@ -434,6 +434,8 @@ export function createSidebar({ onClose, onToggleCollapse }) {
   }
 
   new ResizeObserver(() => moveIndicator()).observe(nav);
+  nav.addEventListener('scroll', () => { if (nav.scrollLeft !== 0) nav.scrollLeft = 0; }, { passive: true });
+  el.addEventListener('scroll', () => { if (el.scrollLeft !== 0) el.scrollLeft = 0; }, { passive: true });
   renderNav();
   renderFoot();
 
@@ -447,7 +449,12 @@ export function createSidebar({ onClose, onToggleCollapse }) {
     setActive(path) {
       activePath = path;
       renderNav();
-      nav.querySelector('.nav-item[aria-current="page"]')?.scrollIntoView({ block: 'nearest' });
+      const target = nav.querySelector('.nav-item[aria-current="page"]');
+      if (target) {
+        target.scrollIntoView({ block: 'nearest', inline: 'start' });
+        nav.scrollLeft = 0;
+        el.scrollLeft = 0;
+      }
     },
     setCollapsed(c) {
       collapsed = c;

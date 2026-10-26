@@ -42,7 +42,7 @@
     --row-h: 52px; --control-h: 42px; --cell-pad: var(--space-3) var(--space-4);
 
     /* shell sizes */
-    --sidebar-w: 264px; --sidebar-w-collapsed: 72px; --header-h: 64px; --bottom-nav-h: 64px;
+    --sidebar-w: 280px; --sidebar-w-collapsed: 72px; --header-h: 64px; --bottom-nav-h: 64px;
     --target-min: 44px;
 
     /* Ellowring official 5-sector logo colors */
