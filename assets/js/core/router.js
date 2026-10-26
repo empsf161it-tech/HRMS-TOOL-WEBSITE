@@ -29,7 +29,7 @@ function matchRoute(routes, segs) {
   return null;
 }
 
-const errors = () => import('../modules/_shared/states.js');
+const errors = () => import('../modules/shared/states.js');
 
 async function resolve({ segs, query, path }) {
   if (!segs.length) return { redirect: '/home' };
@@ -38,7 +38,7 @@ async function resolve({ segs, query, path }) {
   if (!mod.public && !appStore.user) return { redirect: `/login?next=${encodeURIComponent(path)}` };
   if (mod.public && appStore.user && segs[0] === 'login' && !query.switch) return { redirect: '/home' };
   if (!mod.public && !mod.always && !canModule(mod.id)) return { view: (await errors()).forbidden, route: { title: '403' }, params: {}, mod };
-  if (!mod.routes) return { view: (await import('../modules/_shared/scheduled.js')).default, route: { title: mod.label }, params: { sub: segs.slice(1).join('/') }, mod };
+  if (!mod.routes) return { view: (await import('../modules/shared/scheduled.js')).default, route: { title: mod.label }, params: { sub: segs.slice(1).join('/') }, mod };
   const { routes } = await mod.routes();
   const m = matchRoute(routes, segs.slice(1));
   if (!m) return { view: (await errors()).notFound, route: { title: '404' }, params: {}, mod };
