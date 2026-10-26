@@ -32,11 +32,10 @@ function matchRoute(routes, segs) {
 const errors = () => import('../modules/shared/states.js');
 
 async function resolve({ segs, query, path }) {
-  if (!segs.length) return { redirect: '/home' };
+  if (!segs.length) return { redirect: '/signup' };
   const mod = findModule(segs[0]);
   if (!mod) return { view: (await errors()).notFound, route: { title: '404' }, params: {} };
-  if (!mod.public && !appStore.user) return { redirect: `/login?next=${encodeURIComponent(path)}` };
-  if (mod.public && appStore.user && segs[0] === 'login' && !query.switch) return { redirect: '/home' };
+  if (!mod.public && !appStore.user) return { redirect: `/signup?next=${encodeURIComponent(path)}` };
   if (!mod.public && !mod.always && !canModule(mod.id)) return { view: (await errors()).forbidden, route: { title: '403' }, params: {}, mod };
   if (!mod.routes) return { view: (await import('../modules/shared/scheduled.js')).default, route: { title: mod.label }, params: { sub: segs.slice(1).join('/') || query.sub || '', ...query }, mod };
   const { routes } = await mod.routes();

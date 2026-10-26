@@ -13,6 +13,7 @@
 @import url("components/data.css");
 @import url("components/nav.css");
 @import url("components/pages.css");
+@import url("components/auth-pages.css");
 @import url("utilities.css");
 @import url("themes/light.css");
 @import url("themes/dark.css");

@@ -6,14 +6,7 @@ import { ROLES } from './permissions.js';
 
 /** Restore a session on page load. @returns {Promise<object|null>} */
 export async function restoreSession() {
-  let u = await api.auth.current();
-  if (!u && !sessionStorage.getItem('eh.logged_out')) {
-    try {
-      u = await api.auth.quickLogin('super_admin');
-    } catch {
-      // ignore
-    }
-  }
+  const u = await api.auth.current();
   if (u) { appStore.user = u; appStore.role = u.role; }
   return u;
 }
@@ -21,6 +14,12 @@ export async function restoreSession() {
 /** Sign in with email + password. Throws ApiError on failure. */
 export async function login(email, password) {
   const u = await api.auth.login(email, password);
+  setUser(u); return u;
+}
+
+/** Register a new user account and open session. */
+export async function register(data) {
+  const u = await api.auth.register(data);
   setUser(u); return u;
 }
 

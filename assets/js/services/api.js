@@ -160,6 +160,28 @@ export const api = {
     },
     /** Demo quick login by role id. */
     async quickLogin(role) { const u = (await db.load('users')).find((x) => x.role === role); return this.open(u); },
+    /** Register new user account. */
+    async register({ name, email, phone, department, role = 'employee', password }) {
+      await simulate();
+      const users = await db.load('users');
+      if (users.some((x) => x.email.toLowerCase() === String(email).trim().toLowerCase())) {
+        throw new ApiError('An account with this email address already exists.', 409);
+      }
+      const newUser = {
+        id: `u-${Date.now()}`,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone ? phone.trim() : '',
+        department: department || 'Engineering',
+        role: role || 'employee',
+        password: password || 'Demo@123',
+        companyId: 'comp-1',
+        active: true,
+      };
+      users.push(newUser);
+      db.save('users');
+      return this.open(newUser);
+    },
     logout() { ls.remove('session'); },
   },
 };

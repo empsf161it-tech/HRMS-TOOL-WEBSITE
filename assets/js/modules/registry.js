@@ -53,6 +53,8 @@ export const MODULES = [
 /** Pseudo-modules handled by the router (not in the sidebar). */
 export const SYSTEM = {
   login: { id: 'login', label: 'Sign in', routes: () => import('./auth/routes.js'), public: true },
+  signup: { id: 'signup', label: 'Create Account', routes: () => import('./auth/signup-routes.js'), public: true },
+  register: { id: 'register', label: 'Create Account', routes: () => import('./auth/signup-routes.js'), public: true },
   auth: { id: 'auth', label: 'Sign in', routes: () => import('./auth/routes.js'), public: true },
   staffing: { id: 'staffing', label: 'Staffing & Deployments', routes: () => import('./staffing/routes.js'), always: true },
   clients: { id: 'clients', label: 'Clients & Projects', routes: () => import('./clients/routes.js'), always: true },

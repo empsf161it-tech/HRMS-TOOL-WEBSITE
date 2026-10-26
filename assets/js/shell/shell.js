@@ -71,6 +71,19 @@ export function mountShell(root = document.body) {
   if (isCollapsed) app.setAttribute('data-collapsed', '');
   checkTablet(tabletMq);
 
+  function updateAuthMode(path) {
+    const cleanPath = (path || '').split('?')[0];
+    const isAuth = cleanPath === '/login' || cleanPath === '/signup' || cleanPath === '/register' || cleanPath.startsWith('/auth');
+    if (isAuth) {
+      app.setAttribute('data-auth-page', '');
+    } else {
+      app.removeAttribute('data-auth-page');
+    }
+  }
+
+  const initialPath = (location.hash || '').replace(/^#/, '').split('?')[0] || '/';
+  updateAuthMode(initialPath);
+
   app.append(sidebar.el, topbar.el, outlet, scrim, bottomNav.el);
   root.append(skipLink, app, announcer);
   // Signal that the app shell is active so body resets its pre-login flex styles
@@ -79,6 +92,7 @@ export function mountShell(root = document.body) {
   // Sync route changes
   bus.on('route-change', ({ path }) => {
     closeDrawer();
+    updateAuthMode(path);
     sidebar.setActive(path);
     bottomNav.setActive(path);
   });
